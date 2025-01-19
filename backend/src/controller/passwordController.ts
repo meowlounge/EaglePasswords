@@ -1,56 +1,62 @@
 import { Request, Response } from "express";
 import { decrypt, encrypt } from "../utils/crypto";
 import { Database } from "../config/db";
-import { Password } from "../types";
+import { Password, User } from "../types";
 import { ulid } from "ulid";
 
-const getUserPasswordsCollection = (username: string, db: any) => db.collection(`passwords_${username}`);
-
 /**
- * Retrieves all stored passwords from the database and decrypts them.
- * Ensures the "passwords" collection exists before querying it.
+ * Retrieves all stored passwords from the user's "passwords" array and decrypts them.
  * 
  * @param req - The Express request object.
  * @param res - The Express response object.
  * @returns {Promise<void>} - Sends a response containing the decrypted passwords.
  */
 export const getPasswords = async (req: Request, res: Response): Promise<void> => {
-    const username = req.user?.username;
+    const userId = req.user?.id;
     const db = await Database.getInstance().connect();
 
-    if (!username) {
+    if (!userId) {
+        console.log("Unauthorized access attempt, no user ID found.");
         res.status(403).send("Unauthorized");
         return;
     }
 
     try {
-        const userPasswordsCollection = getUserPasswordsCollection(username, db);
+        const usersCollection = db.collection("users");
+        const user = await usersCollection.findOne({ id: userId });
 
-        const passwords = await userPasswordsCollection.find({}).toArray();
+        if (!user || !user.passwords) {
+            console.log(`No passwords found for user: ${userId}`);
+            res.status(410).send("No passwords found");
+            return;
+        }
 
-        res.json(passwords.map((pwd: any) => ({
+        const passwords = user.passwords.map((pwd: any) => ({
             ...pwd,
             title: decrypt(pwd.title),
             username: decrypt(pwd.username),
             password: decrypt(pwd.password),
             url: decrypt(pwd.url || ""),
             note: decrypt(pwd.note || "")
-        })));
+        }));
+
+        res.json(passwords);
     } catch (error) {
         console.error("Error retrieving passwords:", error);
         res.status(500).send("Error retrieving passwords");
     }
 };
 
+
 /**
- * Adds a new password to the database after encrypting it.
+ * Adds a new password to the user's "passwords" array after encrypting it.
  * 
  * @param req - The Express request object, containing the password details.
  * @param res - The Express response object.
  * @returns {Promise<void>} - Sends a response indicating whether the password was successfully added.
  */
 export const addPassword = async (req: Request, res: Response): Promise<void> => {
-    const userId = req.user?.username; // Assuming user ID is attached to `req.user`
+    const userId = req.user?.username;
     if (!userId) {
         res.status(401).send("Unauthorized");
         return;
@@ -77,10 +83,23 @@ export const addPassword = async (req: Request, res: Response): Promise<void> =>
             updatedAt: new Date().toISOString(),
         };
 
-        const userPasswordsCollection = getUserPasswordsCollection(userId, db);
-        const result = await userPasswordsCollection.insertOne(newPassword);
+        const usersCollection = db.collection<User>("users");
 
-        newPassword.id = result.insertedId.toString();
+        const result = await usersCollection.updateOne(
+            { username: userId },
+            {
+                $push: { passwords: newPassword }
+            }
+        );
+
+        if (result.matchedCount === 0) {
+            res.status(404).send("User not found");
+            return;
+        }
+
+        if (result.upsertedId) {
+            newPassword.id = result.upsertedId.toString();
+        }
 
         res.status(201).json({ message: "Password added", password: newPassword });
     } catch (error) {
@@ -91,7 +110,7 @@ export const addPassword = async (req: Request, res: Response): Promise<void> =>
 
 
 /**
- * Updates an existing password in the database.
+ * Updates an existing password in the user's "passwords" array.
  * 
  * @param req - The Express request object, containing the password ID and updated fields.
  * @param res - The Express response object.
@@ -116,18 +135,19 @@ export const updatePassword = async (req: Request, res: Response): Promise<void>
 
     try {
         const updateData: any = {};
-        if (title) updateData.title = title;
-        if (username) updateData.username = username;
+        if (title) updateData.title = encrypt(title);
+        if (username) updateData.username = encrypt(username);
         if (password) updateData.password = encrypt(password);
-        if (url) updateData.url = url;
-        if (note) updateData.note = note;
+        if (url) updateData.url = encrypt(url);
+        if (note) updateData.note = encrypt(note);
         updateData.updatedAt = new Date().toISOString();
 
-        const userPasswordsCollection = getUserPasswordsCollection(userId, db);
-        const result = await userPasswordsCollection.updateOne(
+        const usersCollection = db.collection("users");
+        const result = await usersCollection.updateOne(
             { id },
             { $set: updateData }
         );
+
 
         if (result.modifiedCount === 0) {
             res.status(404).send("Password not found");
@@ -142,7 +162,7 @@ export const updatePassword = async (req: Request, res: Response): Promise<void>
 };
 
 /**
- * Deletes a password from the database.
+ * Deletes a password from the user's "passwords" array.
  * 
  * @param req - The Express request object, containing the password ID.
  * @param res - The Express response object.
@@ -160,13 +180,8 @@ export const deletePassword = async (req: Request, res: Response): Promise<void>
     const db = await Database.getInstance().connect();
 
     try {
-        const userPasswordsCollection = getUserPasswordsCollection(userId, db);
-        const result = await userPasswordsCollection.deleteOne({ id });
-
-        if (result.deletedCount === 0) {
-            res.status(404).send("Password not found");
-            return;
-        }
+        const usersCollection = db.collection("users");
+        await usersCollection.deleteOne({ id });
 
         res.json({ message: "Password deleted" });
     } catch (error) {
