@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useHomePageLogic } from '@/hooks/useHomePage';
+import { useHomePageLogic } from "@/hooks/useHomePage";
 import { Button } from "@/components/ui/Button";
 import { DeleteDialog } from "@/components/Dialogs/DeleteDialog";
 import { LoginPrompt } from "@/components/LoginPrompt";
@@ -39,7 +39,7 @@ const HomePage = () => {
     setSelectedPassword,
     newPassword,
     setNewPassword,
-    sortOptions
+    sortOptions,
   } = useHomePageLogic();
 
   if (!isLoggedIn) {
@@ -49,7 +49,6 @@ const HomePage = () => {
   return (
     <div className="min-h-screen bg-neutral-100 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100">
       <main className="container mx-auto">
-
         <Header
           setIsDialogOpen={setIsDialogOpen}
           setIsCSVDialogOpen={setIsCSVDialogOpen}
@@ -92,9 +91,7 @@ const HomePage = () => {
         ) : (
           <div className="text-center py-12">
             <div className="text-neutral-400 mb-2">No passwords found</div>
-            <Button
-              onClick={() => setIsDialogOpen(true)}
-            >
+            <Button onClick={() => setIsDialogOpen(true)}>
               Add your first password
             </Button>
           </div>
@@ -106,7 +103,9 @@ const HomePage = () => {
         onClose={handleCloseDialog}
         onSubmit={handleAddOrUpdatePassword}
         newPassword={newPassword}
-        setNewPassword={(value) => setNewPassword((prev) => ({ ...prev, ...value }))}
+        setNewPassword={(value) =>
+          setNewPassword((prev) => ({ ...prev, ...value }))
+        }
         selectedPassword={selectedPassword}
       />
 
