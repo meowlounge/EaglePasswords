@@ -2,6 +2,9 @@ import { Request, Response } from "express";
 import axios from "axios";
 import jwt from 'jsonwebtoken';
 import { Database } from "../config/db";
+import { User } from "../types";
+import { authenticator } from "otplib";
+import { encrypt } from "../utils/crypto";
 
 const JWT_SECRET = process.env.JWT_SECRET || 'secret';
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID as string;
@@ -58,21 +61,33 @@ export const loginCallback = async (req: Request, res: Response): Promise<void> 
         const { username, avatar, id } = userInfoResponse.data;
 
         const database = await Database.getInstance().connect();
-
-        const usersCollection = database.collection('users');
+        const usersCollection = database.collection<User>('users');
         const existingUser = await usersCollection.findOne({ id });
 
+        const newUser: User = {
+            id,
+            username,
+            avatar,
+            createdAt: "",
+            twoFactorEnabled: false,
+            twoFactorSecret: encrypt(authenticator.generateSecret()),
+            masterPassword: "",
+            passwords: [],
+        };
+
         if (!existingUser) {
-            await usersCollection.insertOne({
-                id,
+            await usersCollection.insertOne(newUser);
+        } else {
+            const updatedUserData: any = {
                 username,
                 avatar,
-                joined_at: new Date(),
-            });
-        } else {
-            if (existingUser.avatar !== avatar) {
-                await usersCollection.updateOne({ id }, { $set: { avatar } });
-            }
+                createdAt: existingUser.createdAt || new Date().toISOString(),
+                twoFactorEnabled: existingUser.twoFactorEnabled || false,
+                twoFactorSecret: existingUser.twoFactorSecret || encrypt(authenticator.generateSecret()),
+                masterPassword: existingUser.masterPassword || "",
+            };
+
+            await usersCollection.updateOne({ id }, { $set: updatedUserData });
         }
 
         const token = jwt.sign({ username, avatar, id }, JWT_SECRET);
@@ -96,3 +111,4 @@ export const loginCallback = async (req: Request, res: Response): Promise<void> 
         }
     }
 };
+

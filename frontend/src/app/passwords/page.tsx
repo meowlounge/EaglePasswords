@@ -1,14 +1,13 @@
-'use client';
+"use client";
 
-import { useHomePageLogic } from '@/app/hooks/useHomePage';
-import { Button } from "@/app/components/ui/Button";
-import { DeleteDialog } from "../components/Dialogs/DeleteDialog";
-import { LoginPrompt } from "../components/LoginPrompt";
-import CSVImporter from "../components/CSVImporter";
-import { PasswordDialog } from "../components/Dialogs/PasswordDialog";
-import { SearchBar } from "../components/ui/SearchBar";
-import { Header } from "../components/ui/Header";
-import { PasswordList } from "../components/Password/PasswordList";
+import { useHomePageLogic } from "@/hooks/useHomePage";
+import { Button } from "@/components/ui/Button";
+import { DeleteDialog } from "@/components/Dialogs/DeleteDialog";
+import { LoginPrompt } from "@/components/LoginPrompt";
+import { PasswordDialog } from "@/components/Dialogs/PasswordDialog";
+import { SearchBar } from "@/components/ui/SearchBar";
+import { Header } from "@/components/ui/Header";
+import { PasswordList } from "@/components/Password/PasswordList";
 
 const HomePage = () => {
   const {
@@ -25,7 +24,6 @@ const HomePage = () => {
     handleDelete,
     handleCloseDialog,
     handleAddOrUpdatePassword,
-    handleImportSuccess,
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
     selectedPassword,
@@ -34,12 +32,10 @@ const HomePage = () => {
     showUsername,
     setshowUsername,
     searchTerm,
-    isCSVDialogOpen,
-    setIsCSVDialogOpen,
     setSelectedPassword,
     newPassword,
     setNewPassword,
-    sortOptions
+    sortOptions,
   } = useHomePageLogic();
 
   if (!isLoggedIn) {
@@ -49,10 +45,8 @@ const HomePage = () => {
   return (
     <div className="min-h-screen bg-neutral-100 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100">
       <main className="container mx-auto">
-
         <Header
           setIsDialogOpen={setIsDialogOpen}
-          setIsCSVDialogOpen={setIsCSVDialogOpen}
         />
 
         <SearchBar
@@ -60,12 +54,6 @@ const HomePage = () => {
           setSearchTerm={setSearchTerm}
           sortOptions={sortOptions}
           setSortOptions={setSortOptions}
-        />
-
-        <CSVImporter
-          isOpen={isCSVDialogOpen}
-          onClose={() => setIsCSVDialogOpen(false)}
-          onImportSuccess={handleImportSuccess}
         />
 
         {loading ? (
@@ -92,9 +80,7 @@ const HomePage = () => {
         ) : (
           <div className="text-center py-12">
             <div className="text-neutral-400 mb-2">No passwords found</div>
-            <Button
-              onClick={() => setIsDialogOpen(true)}
-            >
+            <Button onClick={() => setIsDialogOpen(true)}>
               Add your first password
             </Button>
           </div>
@@ -106,7 +92,9 @@ const HomePage = () => {
         onClose={handleCloseDialog}
         onSubmit={handleAddOrUpdatePassword}
         newPassword={newPassword}
-        setNewPassword={(value) => setNewPassword((prev) => ({ ...prev, ...value }))}
+        setNewPassword={(value) =>
+          setNewPassword((prev) => ({ ...prev, ...value }))
+        }
         selectedPassword={selectedPassword}
       />
 
