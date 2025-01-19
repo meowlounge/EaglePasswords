@@ -15,6 +15,7 @@
     "jsonwebtoken": "latest",
     "mongodb": "latest",
     "nodemon": "latest",
+    "otplib": "^12.0.1",
     "ulid": "latest"
   },
   "devDependencies": {
