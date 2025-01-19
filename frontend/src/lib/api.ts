@@ -16,11 +16,61 @@ export const getAuthToken = (): string | null => {
 };
 
 /**
+ * Extracts the user ID and username from the authentication token.
+ * Validates if the provided `userId` or `username` matches the token's payload.
+ *
+ * @param {Partial<{ id: string; username: string }>} matchCriteria - Criteria to match against the token payload.
+ * @returns {boolean} True if the token is valid and matches the criteria, otherwise false.
+ */
+export const isTokenPayloadValid = (
+  matchCriteria: Partial<{ id: string; username: string }>,
+): boolean => {
+  try {
+    const token = getAuthToken();
+    if (!token) {
+      console.error("No token found");
+      return false;
+    }
+
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    const matchesId = matchCriteria.id ? payload.id === matchCriteria.id : true;
+    const matchesUsername = matchCriteria.username
+      ? payload.username === matchCriteria.username
+      : true;
+
+    if (!matchesId || !matchesUsername) {
+      console.error(
+        "Token validation failed.",
+      );
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error validating token payload:", error);
+    return false;
+  }
+};
+
+/**
+ * Extracts the user ID from the authentication token after validation.
+ *
+ * @param {string} userId - The expected user ID to validate against the token.
+ * @returns {string | null} The user ID if valid and matching, otherwise null.
+ */
+export const getValidatedUserIdFromToken = (
+  userId: string,
+): string | null => {
+  return isTokenPayloadValid({ id: userId }) ? userId : null;
+};
+
+
+/**
  * Extracts the user ID from the authentication token.
  *
  * @returns {string | null} - The user ID if found, otherwise null.
  */
-const getUserIdFromToken = (): string | null => {
+export const getUserIdFromToken = (): string | null => {
   try {
     const token = getAuthToken();
     if (!token) {
@@ -30,6 +80,7 @@ const getUserIdFromToken = (): string | null => {
 
     const payload = JSON.parse(atob(token.split(".")[1]));
     const userId = payload.id;
+    console.log(userId)
     if (!userId) {
       console.error("User ID not found in token payload");
       return null;
@@ -75,7 +126,7 @@ const apiRequest = async <T>(
 };
 
 /**
- * Fetches all passwords from the API.
+ * Fetches all passwords from the API with a security check.
  *
  * @returns {Promise<Password[]>} A list of passwords or an empty array if the request fails.
  */
@@ -83,12 +134,18 @@ export const fetchPasswords = async (): Promise<Password[]> => {
   const token = getAuthToken();
   if (!token) return [];
   const userId = getUserIdFromToken();
+  if (!userId || !isTokenPayloadValid({ id: userId })) {
+    console.error("Invalid token");
+    return [];
+  }
+
   const data = await apiRequest<Password[]>(`/api/passwords/${userId}`, {
     method: "GET",
     headers: { Authorization: `Bearer ${token}` },
   });
   return data || [];
 };
+
 
 /**
  * Adds a new password to the API.
@@ -100,8 +157,12 @@ export const addPassword = async (
   password: Omit<Password, "id">,
 ): Promise<string | null> => {
   const token = getAuthToken();
-  if (!token) return null;
   const userId = getUserIdFromToken();
+  if (!userId || !isTokenPayloadValid({ id: userId })) {
+    console.error("Invalid token");
+    return null;
+  }
+
   const data = await apiRequest<{ id: string }>(`/api/passwords/${userId}`, {
     method: "POST",
     headers: {
@@ -125,8 +186,11 @@ export const updatePassword = async (
   updates: Partial<Password>,
 ): Promise<boolean> => {
   const token = getAuthToken();
-  if (!token) return false;
   const userId = getUserIdFromToken();
+  if (!userId || !isTokenPayloadValid({ id: userId })) {
+    console.error("Invalid token");
+    return false;
+  }
   const response = await apiRequest(`/api/passwords/${userId}/${id}`, {
     method: "PUT",
     headers: {
@@ -146,8 +210,11 @@ export const updatePassword = async (
  */
 export const deletePassword = async (id: string): Promise<boolean> => {
   const token = getAuthToken();
-  if (!token) return false;
   const userId = getUserIdFromToken();
+  if (!userId || !isTokenPayloadValid({ id: userId })) {
+    console.error("Invalid token");
+    return false;
+  }
   const response = await apiRequest(`/api/passwords/${userId}/${id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
@@ -161,9 +228,34 @@ export const deletePassword = async (id: string): Promise<boolean> => {
  * @param {string} id - The ID of the user to retrieve.
  * @returns {Promise<User | null>} The user object or null if the request fails.
  */
+export const deleteUserById = async (id: string): Promise<User | null> => {
+  const token = getAuthToken();
+  if (!token || !isTokenPayloadValid({ id })) {
+    console.error("Invalid token");
+    return null;
+  }
+  const data = await apiRequest<User>(`/api/user/i/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  console.log(data)
+  return data || null;
+};
+
+
+/**
+ * Fetches a user by their ID from the API with validation.
+ *
+ * @param {string} id - The ID of the user to retrieve.
+ * @returns {Promise<User | null>} The user object or null if the request fails.
+ */
 export const fetchUserById = async (id: string): Promise<User | null> => {
   const token = getAuthToken();
-  if (!token) return null;
+  if (!token || !isTokenPayloadValid({ id })) {
+    console.error("Invalid token");
+    return null;
+  }
+
   const data = await apiRequest<User>(`/api/user/i/${id}`, {
     method: "GET",
     headers: { Authorization: `Bearer ${token}` },
@@ -172,7 +264,7 @@ export const fetchUserById = async (id: string): Promise<User | null> => {
 };
 
 /**
- * Fetches a user by their username from the API.
+ * Fetches a user by their username from the API with validation.
  *
  * @param {string} username - The username of the user to retrieve.
  * @returns {Promise<User | null>} The user object or null if the request fails.
@@ -181,13 +273,91 @@ export const fetchUserByUsername = async (
   username: string,
 ): Promise<User | null> => {
   const token = getAuthToken();
-  if (!token) return null;
+  if (!token || !isTokenPayloadValid({ username })) {
+    console.error("Invalid token");
+    return null;
+  }
+
   const data = await apiRequest<User>(`/api/user/u/${username}`, {
     method: "GET",
     headers: { Authorization: `Bearer ${token}` },
   });
   return data || null;
 };
+
+/**
+ * Enables 2FA for the current user.
+ *
+ * @returns {Promise<{ otpauthUrl: string } | null>} The OTP Auth URL to generate the QR code, or null if the request fails.
+ */
+export const enableTwoFactorAuth = async (): Promise<{ otpauthUrl: string } | null> => {
+  const token = getAuthToken();
+  const userId = getUserIdFromToken();
+  if (!userId || !isTokenPayloadValid({ id: userId })) {
+    console.error("Invalid token");
+    return null;
+  }
+
+  const data = await apiRequest<{ otpauthUrl: string }>(`/api/user/enable-2fa/${userId}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  return data || null;
+};
+
+/**
+ * Verifies the 2FA code entered by the user.
+ *
+ * @param {string} code - The 2FA code entered by the user.
+ * @returns {Promise<boolean>} True if the code is valid, otherwise false.
+ */
+export const verifyTwoFactorCode = async (code: string): Promise<boolean> => {
+  const token = getAuthToken();
+  const userId = getUserIdFromToken();
+  if (!userId || !isTokenPayloadValid({ id: userId })) {
+    console.error("Invalid token");
+    return false;
+  }
+
+  const data = await apiRequest<{ message: string }>(`/api/user/verify-2fa/${userId}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ code }),
+  });
+
+  return data !== null && data.message === "2FA code verified successfully";
+};
+
+/**
+ * Disables 2FA for the current user.
+ *
+ * @returns {Promise<boolean>} True if 2FA was disabled successfully, otherwise false.
+ */
+export const disableTwoFactorAuth = async (): Promise<boolean> => {
+  const token = getAuthToken();
+  const userId = getUserIdFromToken();
+  if (!userId || !isTokenPayloadValid({ id: userId })) {
+    console.error("Invalid token");
+    return false;
+  }
+
+  const data = await apiRequest<{ message: string }>(`/api/user/disable-2fa/${userId}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  return data !== null && data.message === "2FA disabled successfully";
+};
+
 
 /**
  * Logs in with Discord via the API.

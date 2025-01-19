@@ -93,7 +93,6 @@ export const UserAvatar = ({
           width={sizeDimensions[size].width}
           height={sizeDimensions[size].height}
           priority
-          unoptimized
         />
       </div>
     );

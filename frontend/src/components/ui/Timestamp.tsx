@@ -1,4 +1,5 @@
-import { formatDistanceToNow } from "date-fns";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { format, formatDistanceToNow } from "date-fns";
 import { Clock, LucideIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -70,7 +71,6 @@ export const TimeStamp = ({
   live = false,
   addSuffix = true,
 }: TimeStampProps) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -85,6 +85,7 @@ export const TimeStamp = ({
 
   return (
     <time
+      title={format(new Date(timestamp), "dd.MM.yyyy HH:mm:ss")}
       dateTime={timestamp}
       className={cn(
         "flex items-center text-xs text-neutral-600 dark:text-neutral-400",
@@ -94,12 +95,12 @@ export const TimeStamp = ({
       {showIcon &&
         (CustomIcon ? (
           <CustomIcon
-            size={16}
+            size={13}
             className="mr-1 text-neutral-500 dark:text-neutral-400"
           />
         ) : (
           <Clock
-            size={16}
+            size={13}
             className="mr-1 text-neutral-500 dark:text-neutral-400"
           />
         ))}

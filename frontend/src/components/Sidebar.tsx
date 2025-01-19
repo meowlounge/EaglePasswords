@@ -31,10 +31,8 @@ export const Sidebar = () => {
   }, [pathname]);
 
   const handleLogout = () => {
-    document.cookie =
-      "eagletoken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;";
     setUser(null);
-    window.location.href = "/passwords";
+    window.location.href = "/logout";
   };
 
   const tabs: Tab[] = [

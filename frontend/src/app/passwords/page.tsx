@@ -4,7 +4,6 @@ import { useHomePageLogic } from "@/hooks/useHomePage";
 import { Button } from "@/components/ui/Button";
 import { DeleteDialog } from "@/components/Dialogs/DeleteDialog";
 import { LoginPrompt } from "@/components/LoginPrompt";
-import CSVImporter from "@/components/CSVImporter";
 import { PasswordDialog } from "@/components/Dialogs/PasswordDialog";
 import { SearchBar } from "@/components/ui/SearchBar";
 import { Header } from "@/components/ui/Header";
@@ -25,7 +24,6 @@ const HomePage = () => {
     handleDelete,
     handleCloseDialog,
     handleAddOrUpdatePassword,
-    handleImportSuccess,
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
     selectedPassword,
@@ -34,8 +32,6 @@ const HomePage = () => {
     showUsername,
     setshowUsername,
     searchTerm,
-    isCSVDialogOpen,
-    setIsCSVDialogOpen,
     setSelectedPassword,
     newPassword,
     setNewPassword,
@@ -51,7 +47,6 @@ const HomePage = () => {
       <main className="container mx-auto">
         <Header
           setIsDialogOpen={setIsDialogOpen}
-          setIsCSVDialogOpen={setIsCSVDialogOpen}
         />
 
         <SearchBar
@@ -59,12 +54,6 @@ const HomePage = () => {
           setSearchTerm={setSearchTerm}
           sortOptions={sortOptions}
           setSortOptions={setSortOptions}
-        />
-
-        <CSVImporter
-          isOpen={isCSVDialogOpen}
-          onClose={() => setIsCSVDialogOpen(false)}
-          onImportSuccess={handleImportSuccess}
         />
 
         {loading ? (
