@@ -1,0 +1,29 @@
+{
+  "name": "backend",
+  "version": "0.0.0",
+  "scripts": {
+    "start": "tsc && nodemon dist/server.js",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "axios": "latest",
+    "cookie-parser": "latest",
+    "cors": "latest",
+    "dotenv": "latest",
+    "express": "latest",
+    "express-session": "latest",
+    "jsonwebtoken": "latest",
+    "mongodb": "latest",
+    "nodemon": "latest",
+    "ulid": "latest"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "latest",
+    "@types/cors": "latest",
+    "@types/express": "latest",
+    "@types/express-session": "latest",
+    "@types/jsonwebtoken": "latest",
+    "@types/node": "latest",
+    "typescript": "latest"
+  }
+}
