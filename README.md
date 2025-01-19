@@ -48,7 +48,7 @@ To get started with development, you'll need to set up the backend and frontend 
    npm install
    ```
 
-3. Set up environment variables in `.env` for the frontend if necessary.
+3. Set up environment variables in [.env](https://github.com/prodbyeagle-inc/EaglePasswords/blob/main/frontend/.env) for the frontend if necessary.
 
 4. Run the frontend development server:
 
