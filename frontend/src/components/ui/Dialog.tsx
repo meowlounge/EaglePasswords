@@ -84,7 +84,7 @@ export const Dialog: React.FC<DialogProps> = ({
       } bg-neutral-950/50 dark:bg-neutral-900/60`}
     >
       <div
-        className={`${isOpen ? "dialog-enter" : "dialog-exit"} p-4 rounded-2xl ${shadowClass} bg-neutral-100 dark:bg-neutral-900 w-fit mx-5 relative transition-all duration-300 max-h-200 overflow-y-scroll border border-neutral-300 dark:border-neutral-800 max-w-200 ${className}`}
+        className={`${isOpen ? "dialog-enter" : "dialog-exit"} p-4 rounded-2xl ${shadowClass} bg-neutral-100 dark:bg-neutral-900 min-w-md mx-5 relative transition-all duration-300 max-h-200 overflow-y-scroll border border-neutral-300 dark:border-neutral-800 max-w-200 ${className}`}
       >
         <button
           onClick={onClose}

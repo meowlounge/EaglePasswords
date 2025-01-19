@@ -133,6 +133,7 @@ const apiRequest = async <T>(
 export const fetchPasswords = async (): Promise<Password[]> => {
   const token = getAuthToken();
   if (!token) return [];
+
   const userId = getUserIdFromToken();
   if (!userId || !isTokenPayloadValid({ id: userId })) {
     console.error("Invalid token");
@@ -143,9 +144,9 @@ export const fetchPasswords = async (): Promise<Password[]> => {
     method: "GET",
     headers: { Authorization: `Bearer ${token}` },
   });
+
   return data || [];
 };
-
 
 /**
  * Adds a new password to the API.

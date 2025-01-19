@@ -2,6 +2,7 @@ import "./globals.css";
 import { AuthProvider } from "@/context/AuthProvider";
 import { DM_Sans } from "next/font/google";
 import { Sidebar } from "@/components/Sidebar";
+import { Toaster } from "sonner";
 
 const font_sans = DM_Sans({ fallback: ["system-ui"], subsets: ["latin"] });
 
@@ -18,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      className="cursor-default select-none dark:bg-neutral-900 bg-neutral-100"
+      className="cursor-default select-none dark:bg-neutral-900 not-dark:bg-neutral-100"
       lang="en"
     >
       <body className={`${font_sans.className} antialiased`}>
@@ -27,6 +28,7 @@ export default function RootLayout({
           <Sidebar />
           <div className="xl:ml-72 md:ml-72 lg:ml-72 max-sm:mt-16 max-md:mt-16">
             {children}
+            <Toaster />
           </div>
         </AuthProvider>
       </body>

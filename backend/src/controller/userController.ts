@@ -120,7 +120,6 @@ export const enableTwoFactorAuth = async (req: Request, res: Response): Promise<
     const { id } = req.params;
 
     if (!id) {
-        console.log("enableTwoFactorAuth - ID is required");
         res.status(400).send("ID is required");
         return;
     }
@@ -128,31 +127,22 @@ export const enableTwoFactorAuth = async (req: Request, res: Response): Promise<
     const db = await Database.getInstance().connect();
 
     try {
-        console.log(`enableTwoFactorAuth - Fetching user with ID: ${id}`);
         const user = await db.collection("users").findOne({ id });
 
         if (!user) {
-            console.log(`enableTwoFactorAuth - User with ID ${id} not found`);
             res.status(404).send("User not found");
             return;
         }
 
-        console.log(`enableTwoFactorAuth - User found, generating 2FA secret for: ${user.username}`);
         const twoFactorSecret = authenticator.generateSecret();
         const encryptedSecret = encrypt(twoFactorSecret);
 
-        const currentTime = Date.now();
-        console.log(`Current time (ms): ${currentTime}`);
-        console.log(`Generated OTP secret: ${totp.generate(twoFactorSecret)}`);
-
-        console.log("enableTwoFactorAuth - Updating user document with 2FA details");
         await db.collection("users").updateOne({ id }, {
             $set: { twoFactorEnabled: true, twoFactorSecret: encryptedSecret }
         });
 
         const otpauthUrl = authenticator.keyuri(user.username, "EaglePasswords", twoFactorSecret);
 
-        console.log("enableTwoFactorAuth - 2FA enabled successfully");
         res.json({ message: "2FA enabled", otpauthUrl });
     } catch (error) {
         console.error("enableTwoFactorAuth - Error enabling 2FA:", error);
@@ -172,7 +162,6 @@ export const verifyTwoFactorCode = async (req: Request, res: Response): Promise<
     const { code } = req.body;
 
     if (!id || !code) {
-        console.log("verifyTwoFactorCode - ID and code are required");
         res.status(400).send("ID and code are required");
         return;
     }
@@ -180,27 +169,20 @@ export const verifyTwoFactorCode = async (req: Request, res: Response): Promise<
     const db = await Database.getInstance().connect();
 
     try {
-        console.log(`verifyTwoFactorCode - Fetching user with ID: ${id}`);
         const user = await db.collection("users").findOne({ id });
 
         if (!user || !user.twoFactorEnabled) {
-            console.log(`verifyTwoFactorCode - User with ID ${id} not found or 2FA not enabled`);
             res.status(404).send("User not found or 2FA not enabled");
             return;
         }
 
         const secret = decrypt(user.twoFactorSecret);
-        console.log(`verifyTwoFactorCode - Decrypted secret: ${secret}`);
-        console.log(`verifyTwoFactorCode - OTP generated using secret: ${authenticator.generate(secret)}`);
         const isValid = authenticator.verify({ token: code, secret });
 
         if (!isValid) {
-            console.log("verifyTwoFactorCode - Invalid 2FA code");
             res.status(400).send("Invalid 2FA code");
             return;
         }
-
-        console.log("verifyTwoFactorCode - 2FA code verified successfully");
         res.json({ message: "2FA code verified successfully" });
     } catch (error) {
         console.error("verifyTwoFactorCode - Error verifying 2FA code:", error);
