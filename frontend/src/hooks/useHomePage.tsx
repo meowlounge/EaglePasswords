@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { fetchPasswords, addPassword, updatePassword, deletePassword, getAuthToken } from '../lib/api';
-import type { Password } from '../types';
-import { getPasswordStrength } from '../components/Password/PasswordCard';
+import { fetchPasswords, addPassword, updatePassword, deletePassword, getAuthToken } from '@/lib/api';
+import type { Password } from '@/types';
+import { getPasswordStrength } from '@/components/Password/PasswordCard';
 
 export const useHomePageLogic = () => {
     const [passwords, setPasswords] = useState<Password[]>([]);

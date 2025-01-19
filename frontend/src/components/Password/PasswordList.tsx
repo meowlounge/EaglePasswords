@@ -1,4 +1,4 @@
-import { Password } from "@/app/types";
+import { Password } from "@/types";
 import { PasswordCard } from "./PasswordCard";
 
 interface PasswordListProps {
@@ -20,7 +20,7 @@ export const PasswordList = ({
     handleEdit,
     handleDelete,
 }: PasswordListProps) => (
-    <div className="grid gap-3 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 p-2">
+    <div className="grid gap-3 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 p-4">
         {passwords.map((password: Password) => (
             <PasswordCard
                 key={password.id}

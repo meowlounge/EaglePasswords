@@ -1,14 +1,14 @@
 'use client';
 
-import { useHomePageLogic } from '@/app/hooks/useHomePage';
-import { Button } from "@/app/components/ui/Button";
-import { DeleteDialog } from "../components/Dialogs/DeleteDialog";
-import { LoginPrompt } from "../components/LoginPrompt";
-import CSVImporter from "../components/CSVImporter";
-import { PasswordDialog } from "../components/Dialogs/PasswordDialog";
-import { SearchBar } from "../components/ui/SearchBar";
-import { Header } from "../components/ui/Header";
-import { PasswordList } from "../components/Password/PasswordList";
+import { useHomePageLogic } from '@/hooks/useHomePage';
+import { Button } from "@/components/ui/Button";
+import { DeleteDialog } from "@/components/Dialogs/DeleteDialog";
+import { LoginPrompt } from "@/components/LoginPrompt";
+import CSVImporter from "@/components/CSVImporter";
+import { PasswordDialog } from "@/components/Dialogs/PasswordDialog";
+import { SearchBar } from "@/components/ui/SearchBar";
+import { Header } from "@/components/ui/Header";
+import { PasswordList } from "@/components/Password/PasswordList";
 
 const HomePage = () => {
   const {

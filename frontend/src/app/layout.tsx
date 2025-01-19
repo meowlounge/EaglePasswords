@@ -1,7 +1,7 @@
 import "./globals.css";
-import { AuthProvider } from "./context/AuthProvider";
+import { AuthProvider } from "@/context/AuthProvider";
 import { DM_Sans } from 'next/font/google'
-import { Sidebar } from "./components/Sidebar";
+import { Sidebar } from "@/components/Sidebar";
 
 const font_sans = DM_Sans({ fallback: ["system-ui"], subsets: ['latin'] })
 

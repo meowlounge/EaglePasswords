@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
-import { UserAvatar } from '@/app/components/ui/UserAvatar';
+import { UserAvatar } from '@/components/ui/UserAvatar';
 import { LogOut, Menu } from 'lucide-react';
-import { useAuth } from '@/app/context/AuthProvider';
+import { useAuth } from '@/context/AuthProvider';
 
 /**
  * Navbar component that displays navigation links, user account details, and mobile menu toggle.

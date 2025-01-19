@@ -1,5 +1,5 @@
-import { Dialog } from "@/app/components/ui/Dialog";
-import { Button } from "@/app/components/ui/Button";
+import { Dialog } from "@/components/ui/Dialog";
+import { Button } from "@/components/ui/Button";
 import { Trash2 } from "lucide-react";
 
 interface DeleteDialogProps {

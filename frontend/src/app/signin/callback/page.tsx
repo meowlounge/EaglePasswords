@@ -3,10 +3,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/app/components/ui/Button";
-import { Spinner } from "@/app/components/ui/Spinner";
+import { Button } from "@/components/ui/Button";
+import { Spinner } from "@/components/ui/Spinner";
 import { RefreshCcw } from "lucide-react";
-import { getBaseApiUrl } from "@/app/lib/api";
+import { getBaseApiUrl } from "@/lib/api";
 
 const DiscordCallback = () => {
     const router = useRouter();

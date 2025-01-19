@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { LogOut, Key, X, Menu, LucideIcon, User, Cog } from 'lucide-react';
-import { UserAvatar } from '@/app/components/ui/UserAvatar';
-import { useAuth } from '@/app/context/AuthProvider';
-import { Button } from './ui/Button';
+import { UserAvatar } from '@/components/ui/UserAvatar';
+import { useAuth } from '@/context/AuthProvider';
+import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
 
 interface Tab {
@@ -109,6 +109,7 @@ export const Sidebar = () => {
                             onClick={() => settings()}
                             icon={Cog}
                             className="flex-1/7"
+                            variant='border'
                         />
                     </div>
                 </div>

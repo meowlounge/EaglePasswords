@@ -1,8 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { fetchUserByUsername, getAuthToken } from '@/app/lib/api';
-import { User } from '@/app/types';
+import { fetchUserByUsername, getAuthToken } from '@/lib/api';
+import { User } from '@/types';
 
 /**
  * The context props for the AuthContext.

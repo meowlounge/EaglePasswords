@@ -1,8 +1,8 @@
 import React from "react";
 import Link from "next/link";
-import { Button } from "./ui/Button";
+import { Button } from "@/components/ui/Button";
 import { LogInIcon } from "lucide-react";
-import { getBaseApiUrl } from "../lib/api";
+import { getBaseApiUrl } from "@/lib/api";
 
 export const LoginPrompt: React.FC = () => {
     const loginUrl = `${getBaseApiUrl()}/api/auth`;

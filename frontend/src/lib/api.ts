@@ -1,4 +1,4 @@
-import { Password, User, TwoFactor } from "../types";
+import { Password, User } from "@/types";
 
 /**
  * Retrieves the authentication token from cookies.
@@ -139,87 +139,6 @@ export const deletePassword = async (id: string): Promise<boolean> => {
     if (!token) return false;
     const userId = getUserIdFromToken();
     const response = await apiRequest(`/api/passwords/${userId}/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-    });
-    return response !== null;
-};
-
-/**
- * Fetches all two-factor authentication entries for the current user.
- * 
- * @returns {Promise<TwoFactor[]>} A list of 2FA entries or an empty array if the request fails.
- */
-export const fetchTwoFactorAuthData = async (): Promise<TwoFactor[]> => {
-    const token = getAuthToken();
-    if (!token) return [];
-    const username = getUserIdFromToken();
-    const data = await apiRequest<TwoFactor[]>(`/api/two-factor/${username}`, {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-    });
-    return data || [];
-};
-
-/**
- * Adds a new two-factor authentication entry for the current user.
- * 
- * @param {Omit<TwoFactor, "id" | "createdAt" | "updatedAt">} twoFactorData - The 2FA details to add.
- * @returns {Promise<string | null>} The ID of the created 2FA entry or null if the request fails.
- */
-export const addTwoFactorAuthData = async (
-    twoFactorData: Omit<TwoFactor, "id" | "createdAt" | "updatedAt">
-): Promise<string | null> => {
-    const token = getAuthToken();
-    if (!token) return null;
-    const username = getUserIdFromToken();
-    const data = await apiRequest<{ id: string }>(`/api/two-factor/${username}`, {
-        method: "POST",
-        headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(twoFactorData),
-    });
-    return data?.id || null;
-};
-
-/**
- * Updates an existing two-factor authentication entry for the current user.
- * 
- * @param {string} id - The ID of the 2FA entry to update.
- * @param {Partial<Omit<TwoFactor, "id" | "createdAt">>} updates - The updated 2FA details.
- * @returns {Promise<boolean>} True if the update was successful, otherwise false.
- */
-export const updateTwoFactorAuthData = async (
-    id: string,
-    updates: Partial<Omit<TwoFactor, "id" | "createdAt">>
-): Promise<boolean> => {
-    const token = getAuthToken();
-    if (!token) return false;
-    const username = getUserIdFromToken();
-    const response = await apiRequest(`/api/two-factor/${username}/${id}`, {
-        method: "PUT",
-        headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updates),
-    });
-    return response !== null;
-};
-
-/**
- * Deletes a two-factor authentication entry for the current user.
- * 
- * @param {string} id - The ID of the 2FA entry to delete.
- * @returns {Promise<boolean>} True if the deletion was successful, otherwise false.
- */
-export const deleteTwoFactorAuthData = async (id: string): Promise<boolean> => {
-    const token = getAuthToken();
-    if (!token) return false;
-    const username = getUserIdFromToken();
-    const response = await apiRequest(`/api/two-factor/${username}/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
     });

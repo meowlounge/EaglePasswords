@@ -1,8 +1,8 @@
 import React from 'react';
-import { Eye, EyeOff, Pencil, Trash2, ExternalLink, Copy, CheckCircle, Edit, Clock } from "lucide-react";
-import { Password } from "@/app/types";
+import { Eye, EyeOff, Pencil, Trash2, ExternalLink, Copy, CheckCircle, Edit } from "lucide-react";
+import { Password } from "@/types";
 import { PasswordStrengthBar, gradientVariants } from './PasswordStrengthBar';
-import { TimeStamp } from '../ui/Timestamp';
+import { TimeStamp } from '@/components/ui/Timestamp';
 
 export const getPasswordStrength = (password: string): {
     label: string;
@@ -61,8 +61,8 @@ export const PasswordCard = ({
                 variant={strengthInfo.variant}
             />
 
-            <div className="p-5">
-                <div className="flex items-center justify-between mb-4 pt-2">
+            <div className="p-4">
+                <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3 min-w-0">
                         <h2 className="font-semibold text-neutral-800 truncate dark:text-neutral-100">
                             {password.title}
@@ -149,20 +149,11 @@ export const PasswordCard = ({
                 </div>
 
                 <div className="mt-4 flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-2">
                         <span
                             className={`px-2 py-0.5 rounded-lg text-neutral-100 ${gradientVariants[strengthInfo.variant]}`}>
                             {strengthInfo.label}
                         </span>
-                        •
-                        <TimeStamp
-                            timestamp={password.updatedAt}
-                            live
-                            showIcon={false}
-                            icon={Clock}
-                            extended
-                            text='bearbeitet'
-                        />
                         •
                         <TimeStamp
                             timestamp={password.createdAt}
@@ -170,7 +161,7 @@ export const PasswordCard = ({
                             showIcon={false}
                             icon={Edit}
                             extended
-                            text='erstellt'
+                            text='created'
                         />
                     </div>
                 </div>

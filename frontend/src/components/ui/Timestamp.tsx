@@ -1,8 +1,7 @@
 import { formatDistanceToNow } from "date-fns";
 import { Clock, LucideIcon } from "lucide-react";
-import { de } from "date-fns/locale";
 import { useEffect, useState } from "react";
-import { cn } from "@/app/lib/utils";
+import { cn } from "@/lib/utils";
 
 /**
  * Props for the TimeStamp component.
@@ -99,16 +98,15 @@ export const TimeStamp = ({
                     <Clock size={16} className="mr-1 text-neutral-500 dark:text-neutral-400" />
                 )
             )}
-            {formatDistanceToNow(new Date(timestamp), {
-                includeSeconds: true,
-                addSuffix: addSuffix,
-                locale: de
-            })}
             {extended && text && (
-                <span className="ml-1 text-xs text-neutral-500 dark:text-neutral-400">
+                <span className="mr-1 text-xs text-neutral-500 dark:text-neutral-400">
                     {text}
                 </span>
             )}
+            {formatDistanceToNow(new Date(timestamp), {
+                includeSeconds: true,
+                addSuffix: addSuffix
+            })}
         </time>
     );
 };

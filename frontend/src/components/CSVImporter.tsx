@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState } from 'react';
-import { Button } from '@/app/components/ui/Button';
-import { Dialog } from '@/app/components/ui/Dialog';
-import { Input } from '@/app/components/ui/Input';
+import { Button } from '@/components/ui/Button';
+import { Dialog } from '@/components/ui/Dialog';
+import { Input } from '@/components/ui/Input';
 import Papa from 'papaparse';
-import { addPassword } from '@/app/lib/api';
-import { Password } from '@/app/types';
+import { addPassword } from '@/lib/api';
+import { Password } from '@/types';
 import { FileInput } from 'lucide-react';
 
 interface CSVRow {

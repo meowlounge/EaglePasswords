@@ -1,8 +1,8 @@
 'use client';
 
-import { Dialog } from "@/app/components/ui/Dialog";
-import { Input } from "@/app/components/ui/Input";
-import { Button } from "@/app/components/ui/Button";
+import { Dialog } from "@/components/ui/Dialog";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
 import { Book, Key } from "lucide-react";
 
 interface TwoFactorDialogProps {

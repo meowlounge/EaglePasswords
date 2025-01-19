@@ -1,6 +1,6 @@
 import React from "react";
-import { cn } from "../../lib/utils";
-import { Spinner } from "./Spinner";
+import { cn } from "@/lib/utils";
+import { Spinner } from "@/components/ui/Spinner";
 import { LucideIcon } from "lucide-react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

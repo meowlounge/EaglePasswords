@@ -1,7 +1,7 @@
-import { Button } from "../ui/Button";
+import { Button } from "@/components/ui/Button";
 import { ChevronUp, ChevronDown, Search } from "lucide-react";
-import { Input } from "./Input";
-import { Select } from "./Select";
+import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 
 interface SearchBarProps {
     searchTerm: string;
@@ -24,7 +24,7 @@ export const SearchBar = ({
     };
 
     return (
-        <div className="flex space-x-2 p-2">
+        <div className="flex space-x-2 pt-4 px-4">
             <Input
                 type="search"
                 placeholder="Search passwords..."
@@ -41,7 +41,7 @@ export const SearchBar = ({
                     { value: "username", label: "Username" },
                     { value: "createdAt", label: "Created At" },
                     { value: "updatedAt", label: "Updated At" },
-                    { value: "strength", label: "Strength"}
+                    { value: "strength", label: "Strength" }
                 ]}
                 className="w-48"
             />

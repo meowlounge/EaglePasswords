@@ -1,4 +1,4 @@
-import { Password } from "../types";
+import { Password } from "@/types";
 
 // lib/csvParser.ts
 export const parseCSV = (file: File): Promise<Password[]> => {

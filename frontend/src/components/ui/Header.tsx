@@ -1,4 +1,4 @@
-import { Button } from "@/app/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { Plus, FileUp, FileDown } from "lucide-react";
 
 export interface HeaderProps {

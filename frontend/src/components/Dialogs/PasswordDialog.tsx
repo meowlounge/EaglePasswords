@@ -1,8 +1,8 @@
-import { Dialog } from "@/app/components/ui/Dialog";
-import { Input } from "@/app/components/ui/Input";
-import { Button } from "@/app/components/ui/Button";
+import { Dialog } from "@/components/ui/Dialog";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
 import { Book, UserCircle2Icon, LockKeyhole, Link2, Notebook } from "lucide-react";
-import type { Password } from "@/app/types";
+import type { Password } from "@/types";
 
 interface PasswordDialogProps {
     isOpen: boolean;
