@@ -120,8 +120,7 @@ export const Select = <T extends string | number>({
       {isOpen && (
         <div className="absolute z-10 w-full mt-2">
           <div className="relative">
-            <div className="absolute inset-0 h-10 rounded-lg bg-neutral-100 dark:bg-neutral-800 shadow-lg ring-1 ring-neutral-200/50 dark:ring-neutral-700/50" />
-            <div className="relative rounded-lg bg-neutral-100 dark:bg-neutral-800 p-1">
+            <div className="relative rounded-lg bg-neutral-100 dark:bg-neutral-800 p-1 shadow-2xl shadow-neutral-300 dark:shadow-neutral-950">
               <ul className="max-h-60 overflow-auto">
                 {options.map((option, index) => (
                   <li
@@ -134,9 +133,9 @@ export const Select = <T extends string | number>({
                               relative cursor-pointer select-none rounded-md px-2.5 py-2 text-sm
                               transition-colors duration-150
                               ${option.value === value
-                              ? "bg-neutral-200 text-neutral-700 dark:bg-neutral-900/20 dark:text-neutral-100"
-                              : "text-neutral-900 hover:bg-neutral-200 dark:text-neutral-100 dark:hover:bg-neutral-700/50"
-                    }
+                        ? "bg-neutral-200 text-neutral-700 dark:bg-neutral-900/20 dark:text-neutral-100"
+                        : "text-neutral-900 hover:bg-neutral-200 dark:text-neutral-100 dark:hover:bg-neutral-700/50"
+                      }
                                             ${index === options.length - 1 ? "mb-0" : "mb-1"}
                                         `}
                   >

@@ -1,8 +1,8 @@
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthProvider";
 import { DM_Sans } from "next/font/google";
-import { Sidebar } from "@/components/Sidebar";
 import { Toaster } from "sonner";
+import Navbar from "@/components/Navbar";
 
 const font_sans = DM_Sans({ fallback: ["system-ui"], subsets: ["latin"] });
 
@@ -25,8 +25,8 @@ export default function RootLayout({
       <body className={`${font_sans.className} antialiased`}>
         <link rel="icon" href={metadata.icons.icon} />
         <AuthProvider>
-          <Sidebar />
-          <div className="xl:ml-72 md:ml-72 lg:ml-72 max-sm:mt-16 max-md:mt-16">
+          <Navbar />
+          <div>
             {children}
             <Toaster />
           </div>
