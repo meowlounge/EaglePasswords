@@ -24,6 +24,7 @@ import { TimeStamp } from "@/components/ui/Timestamp";
 import { TwoFactorDialog } from "@/components/Dialogs/TwoFactorDialog";
 import { toast } from "sonner";
 import { useTheme } from "@/hooks/useTheme";
+import { ChangeMasterPasswordDialog } from "@/components/Dialogs/ChangeMasterPasswordDialog";
 
 const SettingsPage = () => {
     const { setPasswords, passwords } =
@@ -38,6 +39,7 @@ const SettingsPage = () => {
     const { darkMode, toggleDarkMode } = useTheme();
     const [isImportDialogOpen, setIsImportDialogOpen] = useState<boolean>(false);
     const [isExportDialogOpen, setIsExportDialogOpen] = useState<boolean>(false);
+    const [isChangePasswordDialogOpen, setIsChangePasswordDialogOpen] = useState(false);
 
     useEffect(() => {
         const loadUserData = async () => {
@@ -219,7 +221,7 @@ const SettingsPage = () => {
                                     </div>
                                 </div>
                                 <Button
-                                    onClick={() => toast('Changed Master Password')}
+                                    onClick={() => setIsChangePasswordDialogOpen(true)}
                                     icon={Lock}
                                     content="Change"
                                     variant="border"
@@ -326,6 +328,11 @@ const SettingsPage = () => {
                     isOpen={isImportDialogOpen}
                     onClose={() => setIsImportDialogOpen(false)}
                     onImportSuccess={handleImportSuccess}
+                />
+
+                <ChangeMasterPasswordDialog
+                    isOpen={isChangePasswordDialogOpen}
+                    onClose={() => setIsChangePasswordDialogOpen(false)}
                 />
             </div>
         </div >

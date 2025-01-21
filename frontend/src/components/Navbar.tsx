@@ -56,8 +56,8 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <span className="p-2 rounded-lg dark:text-neutral-100 text-neutral-800 text-lg font-semibold hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors duration-200">
-              EaglePasswords
+            <span className="p-2 rounded-lg dark:text-neutral-100 text-neutral-800 text-lg font-semibold">
+              EaglePasswords (WIP)
             </span>
           </div>
 

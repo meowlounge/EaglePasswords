@@ -60,8 +60,8 @@ export const SearchBar = ({
       />
       <Button
         icon={sortOptions.order === "asc" ? ChevronUp : ChevronDown}
-        content={sortOptions.order === "asc" ? "Ascending" : "Descending"}
         onClick={toggleSortOrder}
+        variant="border"
       />
     </div>
   );

@@ -28,7 +28,7 @@ export default function RootLayout({
           <Navbar />
           <div>
             {children}
-            <Toaster />
+            <Toaster richColors />
           </div>
         </AuthProvider>
       </body>
