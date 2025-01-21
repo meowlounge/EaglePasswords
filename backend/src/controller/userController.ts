@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Database } from "../config/db";
 import { decrypt, encrypt } from "../utils/crypto";
-import { authenticator, totp } from "otplib";
+import type { User } from "../types";
 
 /**
  * Retrieves a user by their username from the database.
@@ -107,126 +107,59 @@ export const deleteUserById = async (req: Request, res: Response): Promise<void>
     }
 };
 
-//? 2FA
-
 /**
- * Enables 2FA for the user by generating and storing a secret.
- * 
- * @param req - The Express request object, containing the user ID as a parameter.
+ * Updates a user's information dynamically based on the `User` type.
+ * Handles specific cases like updating the master password and two-factor authentication secret.
+ *
+ * @param req - The Express request object, containing the user ID in params and fields to update in the body.
  * @param res - The Express response object.
- * @returns {Promise<void>} - Sends a response containing the status of enabling 2FA.
  */
-export const enableTwoFactorAuth = async (req: Request, res: Response): Promise<void> => {
+export const updateUser = async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
+    const updates: Partial<User> = req.body;
 
     if (!id) {
-        res.status(400).send("ID is required");
+        res.status(400).json({ message: "User ID is required." });
+        return;
+    }
+
+    if (!updates || Object.keys(updates).length === 0) {
+        res.status(400).json({ message: "No valid fields to update." });
         return;
     }
 
     const db = await Database.getInstance().connect();
 
     try {
-        const user = await db.collection("users").findOne({ id });
-
+        const user = await db.collection<User>("users").findOne({ id });
         if (!user) {
-            res.status(404).send("User not found");
+            res.status(404).json({ message: "User not found." });
             return;
         }
 
-        const twoFactorSecret = authenticator.generateSecret();
-        const encryptedSecret = encrypt(twoFactorSecret);
+        if (updates.twoFactorSecret) {
+            updates.twoFactorSecret = encrypt(updates.twoFactorSecret);
+        }
 
-        await db.collection("users").updateOne({ id }, {
-            $set: { twoFactorEnabled: true, twoFactorSecret: encryptedSecret }
-        });
+        if (updates.masterPassword) {
+            updates.twoFactorSecret = encrypt(updates.masterPassword);
+        }
 
-        const otpauthUrl = authenticator.keyuri(user.username, "EaglePasswords", twoFactorSecret);
+        if (updates.passwords) {
+            res.status(400).json({ message: "Passwords cannot be updated directly through this endpoint." });
+            return;
+        }
 
-        res.json({ message: "2FA enabled", otpauthUrl });
+        const result = await db.collection<User>("users").updateOne({ id }, { $set: updates });
+
+        if (result.matchedCount === 0) {
+            res.status(404).json({ message: "User not found." });
+            return;
+        }
+
+        res.status(200).json({ message: "User updated successfully." });
     } catch (error) {
-        console.error("enableTwoFactorAuth - Error enabling 2FA:", error);
-        res.status(500).send("Error enabling 2FA");
-    }
-};
-
-/**
- * Verifies the 2FA code entered by the user.
- * 
- * @param req - The Express request object, containing the user ID and code as parameters.
- * @param res - The Express response object.
- * @returns {Promise<void>} - Sends a response indicating whether the 2FA code is valid.
- */
-export const verifyTwoFactorCode = async (req: Request, res: Response): Promise<void> => {
-    const { id } = req.params;
-    const { code } = req.body;
-
-    if (!id || !code) {
-        res.status(400).send("ID and code are required");
-        return;
-    }
-
-    const db = await Database.getInstance().connect();
-
-    try {
-        const user = await db.collection("users").findOne({ id });
-
-        if (!user || !user.twoFactorEnabled) {
-            res.status(404).send("User not found or 2FA not enabled");
-            return;
-        }
-
-        const secret = decrypt(user.twoFactorSecret);
-        const isValid = authenticator.verify({ token: code, secret });
-
-        if (!isValid) {
-            res.status(400).send("Invalid 2FA code");
-            return;
-        }
-        res.json({ message: "2FA code verified successfully" });
-    } catch (error) {
-        console.error("verifyTwoFactorCode - Error verifying 2FA code:", error);
-        res.status(500).send("Error verifying 2FA code");
-    }
-};
-
-/**
- * Disables 2FA for the user.
- * 
- * @param req - The Express request object, containing the user ID as a parameter.
- * @param res - The Express response object.
- * @returns {Promise<void>} - Sends a response indicating whether 2FA was disabled successfully.
- */
-export const disableTwoFactorAuth = async (req: Request, res: Response): Promise<void> => {
-    const { id } = req.params;
-
-    if (!id) {
-        console.log("disableTwoFactorAuth - ID is required");
-        res.status(400).send("ID is required");
-        return;
-    }
-
-    const db = await Database.getInstance().connect();
-
-    try {
-        console.log(`disableTwoFactorAuth - Fetching user with ID: ${id}`);
-        const user = await db.collection("users").findOne({ id });
-
-        if (!user) {
-            console.log(`disableTwoFactorAuth - User with ID ${id} not found`);
-            res.status(404).send("User not found");
-            return;
-        }
-
-        console.log("disableTwoFactorAuth - Disabling 2FA and clearing secret");
-        await db.collection("users").updateOne({ id }, {
-            $set: { twoFactorEnabled: false, twoFactorSecret: "" }
-        });
-
-        console.log("disableTwoFactorAuth - 2FA disabled successfully");
-        res.json({ message: "2FA disabled successfully" });
-    } catch (error) {
-        console.error("disableTwoFactorAuth - Error disabling 2FA:", error);
-        res.status(500).send("Error disabling 2FA");
+        console.error("Error updating user:", error);
+        res.status(500).json({ message: "An error occurred while updating the user." });
     }
 };
