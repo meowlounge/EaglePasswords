@@ -1,8 +1,6 @@
-# Ignore everything
+# ignore everything
 *
 
-# Allow these directories to be formatted
+# allow src
 !frontend/src/*
 !backend/src/*
-
-# You can add other specific exclusions as needed
