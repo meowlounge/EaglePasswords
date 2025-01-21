@@ -36,13 +36,14 @@ app.use(session({
     saveUninitialized: true,
 }));
 
-Database.getInstance()
-    .connect()
+const db = Database.getInstance();
+
+db.query('users', { id: 'test' })
     .then(() => {
-        console.log('[DB]: Database connected successfully');
+        console.log('[DB]: Supabase connected successfully');
     })
-    .catch(err => {
-        console.error('[ERROR]: Database connection failed:', err);
+    .catch((err) => {
+        console.error('[ERROR]: Supabase connection failed:', err);
         process.exit(1);
     });
 
@@ -50,7 +51,7 @@ app.use(authRoutes);
 app.use(passwordRoutes);
 app.use(userRoutes);
 app.use(statusRoutes);
-app.use(twoFactorRoutes)
+app.use(twoFactorRoutes);
 
 app.listen(PORT, () => {
     console.log(`[INFO]: Server running on http://localhost:${PORT}`);

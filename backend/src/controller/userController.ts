@@ -18,21 +18,21 @@ export const getUserByUsername = async (req: Request, res: Response): Promise<vo
         return;
     }
 
-    const db = await Database.getInstance().connect();
+    const db = Database.getInstance();
 
     try {
-        const user = await db.collection("users").findOne({ username });
+        const user = await db.query("users", { username });
 
-        if (!user) {
+        if (!user || !user[0]) {
             res.status(404).send("User not found");
             return;
         }
 
-        if (user.twoFactorSecret) {
-            user.twoFactorSecret = decrypt(user.twoFactorSecret);
+        if (user[0].twoFactorSecret) {
+            user[0].twoFactorSecret = decrypt(user[0].twoFactorSecret);
         }
 
-        res.json(user);
+        res.json(user[0]);
     } catch (error) {
         console.error("Error retrieving user by username:", error);
         res.status(500).send("Error retrieving user");
@@ -54,21 +54,21 @@ export const getUserById = async (req: Request, res: Response): Promise<void> =>
         return;
     }
 
-    const db = await Database.getInstance().connect();
+    const db = Database.getInstance();
 
     try {
-        const user = await db.collection("users").findOne({ id });
+        const user = await db.query("users", { id });
 
-        if (!user) {
+        if (!user || !user[0]) {
             res.status(404).send("User not found");
             return;
         }
 
-        if (user.twoFactorSecret) {
-            user.twoFactorSecret = decrypt(user.twoFactorSecret);
+        if (user[0].twoFactorSecret) {
+            user[0].twoFactorSecret = decrypt(user[0].twoFactorSecret);
         }
 
-        res.json(user);
+        res.json(user[0]);
     } catch (error) {
         console.error("Error retrieving user by ID:", error);
         res.status(500).send("Error retrieving user");
@@ -90,12 +90,12 @@ export const deleteUserById = async (req: Request, res: Response): Promise<void>
         return;
     }
 
-    const db = await Database.getInstance().connect();
+    const db = Database.getInstance();
 
     try {
-        const result = await db.collection("users").deleteOne({ id });
+        const result = await db.delete("users", { id });
 
-        if (result.deletedCount === 0) {
+        if (!result || result.length === 0) {
             res.status(404).send("User not found");
             return;
         }
@@ -128,11 +128,12 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
         return;
     }
 
-    const db = await Database.getInstance().connect();
+    const db = Database.getInstance();
 
     try {
-        const user = await db.collection<User>("users").findOne({ id });
-        if (!user) {
+        const user = await db.query("users", { id });
+
+        if (!user || !user[0]) {
             res.status(404).json({ message: "User not found." });
             return;
         }
@@ -142,7 +143,7 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
         }
 
         if (updates.masterPassword) {
-            updates.twoFactorSecret = encrypt(updates.masterPassword);
+            updates.masterPassword = encrypt(updates.masterPassword);
         }
 
         if (updates.passwords) {
@@ -150,9 +151,9 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
             return;
         }
 
-        const result = await db.collection<User>("users").updateOne({ id }, { $set: updates });
+        const result = await db.update("users", updates, { id });
 
-        if (result.matchedCount === 0) {
+        if (!result || result.length === 0) {
             res.status(404).json({ message: "User not found." });
             return;
         }

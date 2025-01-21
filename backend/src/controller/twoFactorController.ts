@@ -18,12 +18,12 @@ export const enableTwoFactorAuth = async (req: Request, res: Response): Promise<
         return;
     }
 
-    const db = await Database.getInstance().connect();
+    const db = Database.getInstance();
 
     try {
-        const user = await db.collection("users").findOne({ id });
+        const user = await db.query("users", { id });
 
-        if (!user) {
+        if (!user || user.length === 0) {
             res.status(404).send("User not found");
             return;
         }
@@ -31,11 +31,9 @@ export const enableTwoFactorAuth = async (req: Request, res: Response): Promise<
         const twoFactorSecret = authenticator.generateSecret();
         const encryptedSecret = encrypt(twoFactorSecret);
 
-        await db.collection("users").updateOne({ id }, {
-            $set: { twoFactorEnabled: true, twoFactorSecret: encryptedSecret }
-        });
+        await db.update("users", { twoFactorEnabled: true, twoFactorSecret: encryptedSecret }, { id });
 
-        const otpauthUrl = authenticator.keyuri(user.username, "EaglePasswords", twoFactorSecret);
+        const otpauthUrl = authenticator.keyuri(user[0].username, "EaglePasswords", twoFactorSecret);
 
         res.json({ message: "2FA enabled", otpauthUrl });
     } catch (error) {
@@ -54,47 +52,36 @@ export const enableTwoFactorAuth = async (req: Request, res: Response): Promise<
 export const verifyTwoFactorCode = async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
     const { code } = req.body;
-    console.log("------------------------------")
-    console.log("verifyTwoFactorCode - Received request:", { id, code });
 
     if (!id || !code) {
-        console.log("verifyTwoFactorCode - Missing id or code", { id, code });
         res.status(400).send("ID and code are required");
         return;
     }
 
-    const db = await Database.getInstance().connect();
+    const db = Database.getInstance();
 
     try {
-        console.log("verifyTwoFactorCode - Fetching user from database with id:", id);
-        const user = await db.collection("users").findOne({ id });
+        const user = await db.query("users", { id });
 
-        if (!user || !user.twoFactorEnabled) {
-            console.log("verifyTwoFactorCode - User not found or 2FA not enabled:", { id });
+        if (!user || user.length === 0 || !user[0].twoFactorEnabled) {
             res.status(404).send("User not found or 2FA not enabled");
             return;
         }
 
-        const secret = decrypt(user.twoFactorSecret);
-        console.log("verifyTwoFactorCode - Decrypted 2FA secret:", secret);
-
+        const secret = decrypt(user[0].twoFactorSecret);
         const isValid = authenticator.verify({ token: code, secret });
-        console.log("verifyTwoFactorCode - 2FA code verification result:", isValid, { token: code, secret });
 
         if (!isValid) {
-            console.log("verifyTwoFactorCode - Invalid 2FA code", { code, secret });
             res.status(400).send("Invalid 2FA code");
             return;
         }
 
-        console.log("verifyTwoFactorCode - 2FA code verified successfully");
         res.json({ message: "2FA code verified successfully" });
     } catch (error) {
         console.error("verifyTwoFactorCode - Error verifying 2FA code:", error);
         res.status(500).send("Error verifying 2FA code");
     }
 };
-
 
 /**
  * Disables 2FA for the user.
@@ -107,29 +94,22 @@ export const disableTwoFactorAuth = async (req: Request, res: Response): Promise
     const { id } = req.params;
 
     if (!id) {
-        console.log("disableTwoFactorAuth - ID is required");
         res.status(400).send("ID is required");
         return;
     }
 
-    const db = await Database.getInstance().connect();
+    const db = Database.getInstance();
 
     try {
-        console.log(`disableTwoFactorAuth - Fetching user with ID: ${id}`);
-        const user = await db.collection("users").findOne({ id });
+        const user = await db.query("users", { id });
 
-        if (!user) {
-            console.log(`disableTwoFactorAuth - User with ID ${id} not found`);
+        if (!user || user.length === 0) {
             res.status(404).send("User not found");
             return;
         }
 
-        console.log("disableTwoFactorAuth - Disabling 2FA and clearing secret");
-        await db.collection("users").updateOne({ id }, {
-            $set: { twoFactorEnabled: false, twoFactorSecret: "" }
-        });
+        await db.update("users", { twoFactorEnabled: false, twoFactorSecret: "" }, { id });
 
-        console.log("disableTwoFactorAuth - 2FA disabled successfully");
         res.json({ message: "2FA disabled successfully" });
     } catch (error) {
         console.error("disableTwoFactorAuth - Error disabling 2FA:", error);

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { decrypt, encrypt } from "../utils/crypto";
 import { Database } from "../config/db";
-import { Password, User } from "../types";
+import { Password } from "../types";
 import { ulid } from "ulid";
 
 /**
@@ -13,7 +13,7 @@ import { ulid } from "ulid";
  */
 export const getPasswords = async (req: Request, res: Response): Promise<void> => {
     const userId = req.user?.id;
-    const db = await Database.getInstance().connect();
+    const db = Database.getInstance();
 
     if (!userId) {
         console.log("Unauthorized access attempt, no user ID found.");
@@ -22,16 +22,15 @@ export const getPasswords = async (req: Request, res: Response): Promise<void> =
     }
 
     try {
-        const usersCollection = db.collection("users");
-        const user = await usersCollection.findOne({ id: userId });
+        const user = await db.query("users", { id: userId });
 
-        if (!user || !user.passwords) {
+        if (!user || !user[0]?.passwords) {
             console.log(`No passwords found for user: ${userId}`);
             res.status(410).send("No passwords found");
             return;
         }
 
-        const passwords = user.passwords.map((pwd: any) => ({
+        const passwords = user[0].passwords.map((pwd: any) => ({
             ...pwd,
             title: decrypt(pwd.title),
             username: decrypt(pwd.username),
@@ -69,7 +68,7 @@ export const addPassword = async (req: Request, res: Response): Promise<void> =>
         return;
     }
 
-    const db = await Database.getInstance().connect();
+    const db = Database.getInstance();
 
     try {
         const newPassword: Password = {
@@ -83,23 +82,16 @@ export const addPassword = async (req: Request, res: Response): Promise<void> =>
             updatedAt: new Date().toISOString(),
         };
 
-        const usersCollection = db.collection<User>("users");
+        const user = await db.query("users", { username: userId });
 
-        const result = await usersCollection.updateOne(
-            { username: userId },
-            {
-                $push: { passwords: newPassword }
-            }
-        );
-
-        if (result.matchedCount === 0) {
+        if (!user || !user[0]) {
             res.status(404).send("User not found");
             return;
         }
 
-        if (result.upsertedId) {
-            newPassword.id = result.upsertedId.toString();
-        }
+        const updatedPasswords = [...user[0].passwords, newPassword];
+
+        await db.update("users", { passwords: updatedPasswords }, { username: userId });
 
         res.status(201).json({ message: "Password added", password: newPassword });
     } catch (error) {
@@ -131,7 +123,7 @@ export const updatePassword = async (req: Request, res: Response): Promise<void>
         return;
     }
 
-    const db = await Database.getInstance().connect();
+    const db = Database.getInstance();
 
     try {
         const updateData: any = {};
@@ -142,17 +134,18 @@ export const updatePassword = async (req: Request, res: Response): Promise<void>
         if (note) updateData.note = encrypt(note);
         updateData.updatedAt = new Date().toISOString();
 
-        const usersCollection = db.collection("users");
-        const result = await usersCollection.updateOne(
-            { id },
-            { $set: updateData }
-        );
+        const user = await db.query("users", { username: userId });
 
-
-        if (result.modifiedCount === 0) {
-            res.status(404).send("Password not found");
+        if (!user || !user[0]) {
+            res.status(404).send("User not found");
             return;
         }
+
+        const updatedPasswords = user[0].passwords.map((pwd: any) =>
+            pwd.id === id ? { ...pwd, ...updateData } : pwd
+        );
+
+        await db.update("users", { passwords: updatedPasswords }, { username: userId });
 
         res.json({ message: "Password updated" });
     } catch (error) {
@@ -177,11 +170,19 @@ export const deletePassword = async (req: Request, res: Response): Promise<void>
 
     const { id } = req.params;
 
-    const db = await Database.getInstance().connect();
+    const db = Database.getInstance();
 
     try {
-        const usersCollection = db.collection("users");
-        await usersCollection.deleteOne({ id });
+        const user = await db.query("users", { username: userId });
+
+        if (!user || !user[0]) {
+            res.status(404).send("User not found");
+            return;
+        }
+
+        const updatedPasswords = user[0].passwords.filter((pwd: any) => pwd.id !== id);
+
+        await db.update("users", { passwords: updatedPasswords }, { username: userId });
 
         res.json({ message: "Password deleted" });
     } catch (error) {
