@@ -7,6 +7,7 @@ import authRoutes from './routes/authRoutes';
 import passwordRoutes from './routes/passwordRoutes';
 import userRoutes from './routes/userRoutes';
 import statusRoutes from './controller/statusController';
+import twoFactorRoutes from './routes/twoFactorRoutes';
 import { Database } from './config/db';
 
 dotenv.config();
@@ -49,6 +50,7 @@ app.use(authRoutes);
 app.use(passwordRoutes);
 app.use(userRoutes);
 app.use(statusRoutes);
+app.use(twoFactorRoutes)
 
 app.listen(PORT, () => {
     console.log(`[INFO]: Server running on http://localhost:${PORT}`);
