@@ -1,11 +1,30 @@
+'use client'
+
 import React from "react";
-import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { LogInIcon } from "lucide-react";
-import { getBaseApiUrl } from "@/lib/api";
+import { connectDB } from "@/lib/api";
+import { useRouter } from "next/navigation";
 
 export const LoginPrompt: React.FC = () => {
-  const loginUrl = `${getBaseApiUrl()}/api/auth`;
+  const router = useRouter();
+  const handleLoginClick = async () => {
+    try {
+      const supabase = await connectDB();
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "discord",
+        options: { redirectTo: "http://localhost:3000/signin/callback" }
+      });
+
+      if (error) {
+        console.error("Error during Discord sign-in:", error.message);
+      } else {
+        router.push("/passwords");
+      }
+    } catch (err) {
+      console.error("Error during login:", err);
+    }
+  };
 
   return (
     <div className="flex bg-neutral-900 items-center justify-center p-8 min-h-screen">
@@ -19,15 +38,13 @@ export const LoginPrompt: React.FC = () => {
           </p>
         </div>
 
-        <Link href={loginUrl}>
-          <Button
-            size="lg"
-            className="w-full"
-            content="Anmelden"
-            icon={LogInIcon}
-            variant="secondary"
-          ></Button>
-        </Link>
+        <Button
+          size="lg"
+          className="w-full"
+          content="Anmelden (yur)"
+          icon={LogInIcon}
+          onClick={handleLoginClick}
+        />
       </div>
     </div>
   );

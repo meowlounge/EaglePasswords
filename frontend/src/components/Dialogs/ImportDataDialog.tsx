@@ -181,7 +181,7 @@ export const DataImporter = ({
             onChange={(value) => setImportFormat(value as "csv" | "json")}
             options={[
               { value: "csv", label: "CSV" },
-              { value: "json", label: "JSON" },
+              { value: "json", label: "JSON (Currently Dev Only)" },
             ]}
             className="mt-2"
           />

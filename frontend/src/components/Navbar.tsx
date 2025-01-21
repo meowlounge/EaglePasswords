@@ -66,7 +66,6 @@ const Navbar = () => {
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="md:hidden p-2 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors duration-200"
-              aria-label="Toggle mobile menu"
             >
               <Menu className="w-5 h-5 text-neutral-800 dark:text-neutral-100" />
             </button>
@@ -77,8 +76,6 @@ const Navbar = () => {
                   <button
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                     className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors duration-200"
-                    aria-expanded={isMenuOpen}
-                    aria-haspopup="true"
                   >
                     <UserAvatar
                       size="sm"

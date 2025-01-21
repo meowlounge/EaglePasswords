@@ -1,4 +1,19 @@
 import { Password, User } from "@/types";
+import { createClient } from '@supabase/supabase-js';
+
+export const connectDB = async () => {
+  const supabaseUrl = "https://szzbigujyuvejetfffio.supabase.co";
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error('SUPABASE_URL or SUPABASE_KEY is not defined in the environment variables.');
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseKey);
+  return supabase;
+};
+
+connectDB();
 
 /**
  * Retrieves the authentication token from cookies.
@@ -64,23 +79,22 @@ export const getValidatedUserIdFromToken = (
   return isTokenPayloadValid({ id: userId }) ? userId : null;
 };
 
-
 /**
  * Extracts the user ID from the authentication token.
- *
+ * 
+ * @param token - Optional token. If not provided, it will fall back to using getAuthToken().
  * @returns {string | null} - The user ID if found, otherwise null.
  */
-export const getUserIdFromToken = (): string | null => {
+export const getUserIdFromToken = (token?: string): string | null => {
   try {
-    const token = getAuthToken();
-    if (!token) {
+    const authToken = token || getAuthToken();
+    if (!authToken) {
       console.error("No token found");
       return null;
     }
 
-    const payload = JSON.parse(atob(token.split(".")[1]));
+    const payload = JSON.parse(atob(authToken.split(".")[1]));
     const userId = payload.id;
-    console.log(userId)
     if (!userId) {
       console.error("User ID not found in token payload");
       return null;
@@ -147,6 +161,40 @@ export const fetchPasswords = async (): Promise<Password[]> => {
 
   return data || [];
 };
+
+/**
+ * Updates the master password for the current user.
+ *
+ * @param {string} currentPassword - The current master password (for verification).
+ * @param {string} newPassword - The new master password to set.
+ * @returns {Promise<{ success: boolean; message: string }>} Result of the update process.
+ */
+export const updateMasterPassword = async (
+  currentPassword: string,
+  newPassword: string
+): Promise<{ success: boolean; message: string }> => {
+  const token = getAuthToken();
+  const userId = getUserIdFromToken();
+
+  if (!userId || !isTokenPayloadValid({ id: userId })) {
+    return { success: false, message: "Invalid or expired token" };
+  }
+
+  const response = await apiRequest<{ success: boolean; message: string }>(
+    `/api/user/i/${userId}`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ currentPassword, newPassword }),
+    }
+  );
+
+  return response || { success: false, message: "Failed to update master password" };
+};
+
 
 /**
  * Adds a new password to the API.
@@ -235,7 +283,7 @@ export const deleteUserById = async (id: string): Promise<User | null> => {
     console.error("Invalid token");
     return null;
   }
-  const data = await apiRequest<User>(`/api/user/i/${id}`, {
+  const data = await apiRequest<User>(`/api/users/${id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -257,7 +305,7 @@ export const fetchUserById = async (id: string): Promise<User | null> => {
     return null;
   }
 
-  const data = await apiRequest<User>(`/api/user/i/${id}`, {
+  const data = await apiRequest<User>(`/api/users/${id}`, {
     method: "GET",
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -279,7 +327,7 @@ export const fetchUserByUsername = async (
     return null;
   }
 
-  const data = await apiRequest<User>(`/api/user/u/${username}`, {
+  const data = await apiRequest<User>(`/api/users/u/${username}`, {
     method: "GET",
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -299,7 +347,7 @@ export const enableTwoFactorAuth = async (): Promise<{ otpauthUrl: string } | nu
     return null;
   }
 
-  const data = await apiRequest<{ otpauthUrl: string }>(`/api/user/enable-2fa/${userId}`, {
+  const data = await apiRequest<{ otpauthUrl: string }>(`/api/twofactor/enable/${userId}`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -315,18 +363,18 @@ export const enableTwoFactorAuth = async (): Promise<{ otpauthUrl: string } | nu
  * @param {string} code - The 2FA code entered by the user.
  * @returns {Promise<boolean>} True if the code is valid, otherwise false.
  */
-export const verifyTwoFactorCode = async (code: string): Promise<boolean> => {
-  const token = getAuthToken();
+export const verifyTwoFactorCode = async (code: string, token?: string): Promise<boolean> => {
+  const authToken = token || getAuthToken();
   const userId = getUserIdFromToken();
   if (!userId || !isTokenPayloadValid({ id: userId })) {
     console.error("Invalid token");
     return false;
   }
 
-  const data = await apiRequest<{ message: string }>(`/api/user/verify-2fa/${userId}`, {
+  const data = await apiRequest<{ message: string }>(`/api/twofactor/verify/${userId}`, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${authToken}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ code }),
@@ -348,7 +396,7 @@ export const disableTwoFactorAuth = async (): Promise<boolean> => {
     return false;
   }
 
-  const data = await apiRequest<{ message: string }>(`/api/user/disable-2fa/${userId}`, {
+  const data = await apiRequest<{ message: string }>(`/api/twofactor/disable/${userId}`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -364,6 +412,16 @@ export const disableTwoFactorAuth = async (): Promise<boolean> => {
  * Logs in with Discord via the API.
  * Redirects to the Discord authentication page.
  */
-export const loginWithDiscord = (): void => {
-  window.location.href = `${getBaseApiUrl()}/api/auth`;
-};
+export async function signInWithDiscord() {
+  const supabase = await connectDB();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'discord',
+  });
+
+  if (error) {
+    console.error('Error during Discord sign-in:', error.message);
+    return null;
+  }
+
+  return data;
+}

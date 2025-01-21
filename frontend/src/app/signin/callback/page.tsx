@@ -6,33 +6,48 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
 import { RefreshCcw } from "lucide-react";
-import { getBaseApiUrl, fetchUserById } from "@/lib/api";
+import { getBaseApiUrl, fetchUserById, getUserIdFromToken, verifyTwoFactorCode } from "@/lib/api";
 import { VerifyTwoFactorDialog } from "@/components/Dialogs/VerifyTwoFactor";
-import { User } from "@/types";
 
 const DiscordCallback = () => {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
-  const [user, setUser] = useState<User | null>(null);
   const [is2FADialogOpen, setIs2FADialogOpen] = useState(false);
   const [twoFASecret, setTwoFASecret] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchToken = async () => {
+    const handleCallback = async () => {
       try {
-        const token = new URLSearchParams(window.location.search).get("token") || null;
-        if (!token) {
+        const params = new URLSearchParams(window.location.search);
+        const state = params.get("state");
+
+        if (!state) {
           setError("Kein Authentifizierungstoken vorhanden.");
           return;
         }
 
-        document.cookie = `eagletoken=${token}; Expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; secure; SameSite=Strict`;
+        setToken(state);
 
-        // Fetch user data
-        const userData = await fetchUserById(token);
-        if (userData?.twoFactorEnabled) {
+        const decodedToken = JSON.parse(atob(state.split('.')[1]));
+
+        document.cookie = `eagletoken=${state}; Expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; secure; SameSite=Strict`;
+
+        const userId = decodedToken?.id;
+        if (!userId) {
+          setError("Benutzer nicht gefunden.");
+          return;
+        }
+
+        const userData = await fetchUserById(userId || "");
+
+        if (!userData) {
+          setError("Benutzer nicht gefunden.");
+          return;
+        }
+
+        if (userData.twoFactorEnabled) {
           setTwoFASecret(userData.twoFactorSecret || "");
-          setUser(userData);
           setIs2FADialogOpen(true);
         } else {
           router.push("/passwords");
@@ -42,7 +57,7 @@ const DiscordCallback = () => {
       }
     };
 
-    fetchToken();
+    handleCallback();
   }, [router]);
 
   if (error) {
@@ -52,9 +67,7 @@ const DiscordCallback = () => {
           <h2 className="text-3xl font-bold text-red-500 mb-4">Fehler!</h2>
           <p className="text-neutral-300 mb-6">{error}</p>
           <Button
-            onClick={() =>
-              (window.location.href = `${getBaseApiUrl()}/api/auth`)
-            }
+            onClick={() => (window.location.href = `${getBaseApiUrl()}/api/auth`)}
             variant="danger"
             className="w-full"
             icon={RefreshCcw}
@@ -77,28 +90,22 @@ const DiscordCallback = () => {
       <VerifyTwoFactorDialog
         isOpen={is2FADialogOpen}
         onClose={() => setIs2FADialogOpen(false)}
-        onSubmit={(otp) => {
-          // Submit the OTP to verify the code
-          verify2FACode(otp);
-        }}
+        onSubmit={verify2FACode}
       />
     </div>
   );
 
   async function verify2FACode(otp: string) {
     try {
-      const response = await fetch(`${getBaseApiUrl()}/verify-2fa`, {
-        method: "POST",
-        body: JSON.stringify({ otp }),
-        headers: { "Content-Type": "application/json" },
-      });
-      if (response.ok) {
-        // Successfully verified OTP
-        router.push("/passwords"); // Redirect to the passwords page or whatever page you want
+      const isValid = await verifyTwoFactorCode(otp, token || "");
+
+      if (isValid) {
+        router.push("/passwords");
       } else {
         setError("Ungültiger 2FA-Code. Bitte versuche es erneut.");
       }
     } catch (err) {
+      console.error("Error during 2FA verification:", err);
       setError("Fehler bei der Verifizierung des 2FA-Codes.");
     }
   }

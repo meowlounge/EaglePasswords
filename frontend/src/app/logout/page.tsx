@@ -1,24 +1,25 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { useRouter } from "next/navigation";
-import { getBaseApiUrl } from "@/lib/api";
+import { connectDB } from "@/lib/api";
 
 const LogoutPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
-    const loginUrl = `${getBaseApiUrl()}/api/auth`;
 
     useEffect(() => {
         const logout = async () => {
             try {
+                const supabase = await connectDB();
+                await supabase.auth.signOut();
                 document.cookie =
                     "eagletoken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;";
 
                 setLoading(false);
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
             } catch (err) {
                 setError("An error occurred while logging out.");
                 setLoading(false);
@@ -27,6 +28,23 @@ const LogoutPage = () => {
 
         logout();
     }, [router]);
+
+    const handleLoginClick = async () => {
+        try {
+            const supabase = await connectDB();
+            const { data, error } = await supabase.auth.signInWithOAuth({
+                provider: "discord",
+            });
+
+            if (error) {
+                console.error("Error during Discord sign-in:", error.message);
+            } else {
+                router.push("/passwords");
+            }
+        } catch (err) {
+            console.error("Error during login:", err);
+        }
+    };
 
     if (loading) {
         return (
@@ -54,8 +72,8 @@ const LogoutPage = () => {
                     You have successfully logged out. We hope to see you again soon!
                 </p>
                 <Button
-                    content="Go to Login Page"
-                    onClick={() => router.push(loginUrl)}
+                    content="Log in with Discord"
+                    onClick={handleLoginClick}
                     className="w-full bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
                 />
             </div>
