@@ -11,24 +11,28 @@ const JWT_SECRET = process.env.JWT_SECRET || 'secret';
  * @param next - The next function to pass control to the next middleware.
  * @returns {void}
  */
-export const authenticateToken = (req: Request, res: Response, next: NextFunction): void => {
-    const authHeader = req.headers.authorization;
+export const authenticateToken = (
+     req: Request,
+     res: Response,
+     next: NextFunction
+): void => {
+     const authHeader = req.headers.authorization;
 
-    const token = authHeader && authHeader.split(' ')[1];
+     const token = authHeader && authHeader.split(' ')[1];
 
-    if (!token) {
-        console.error("No token found in authorization header.");
-        res.status(401).send('Unauthorized.');
-        return;
-    }
+     if (!token) {
+          console.error('No token found in authorization header.');
+          res.status(401).send('Unauthorized.');
+          return;
+     }
 
-    jwt.verify(token, JWT_SECRET, (err, user) => {
-        if (err) {
-            res.status(403).send('Invalid token.');
-            return;
-        }
+     jwt.verify(token, JWT_SECRET, (err, user) => {
+          if (err) {
+               res.status(403).send('Invalid token.');
+               return;
+          }
 
-        req.user = user as User;
-        next();
-    });
+          req.user = user as User;
+          next();
+     });
 };

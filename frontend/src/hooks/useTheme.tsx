@@ -1,22 +1,22 @@
-'use client'
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from 'react';
 
 const getInitialTheme = (): boolean => {
-    if (typeof window === "undefined") return true;
+     if (typeof window === 'undefined') return true;
 
-    const storedTheme = localStorage.getItem('theme');
-    if (storedTheme) return storedTheme === "dark";
+     const storedTheme = localStorage.getItem('theme');
+     if (storedTheme) return storedTheme === 'dark';
 
-    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+     return window.matchMedia('(prefers-color-scheme: dark)').matches;
 };
 
 const setTheme = (isDarkMode: boolean) => {
-    if (typeof window !== "undefined") {
-        const theme = isDarkMode ? "dark" : "light";
-        localStorage.setItem("theme", theme);
-        document.documentElement.classList.toggle("dark", isDarkMode);
-    }
+     if (typeof window !== 'undefined') {
+          const theme = isDarkMode ? 'dark' : 'light';
+          localStorage.setItem('theme', theme);
+          document.documentElement.classList.toggle('dark', isDarkMode);
+     }
 };
 
 /**
@@ -26,26 +26,26 @@ const setTheme = (isDarkMode: boolean) => {
  * @returns {Object} - Contains `darkMode` (boolean) and `toggleDarkMode` (function).
  */
 export const useTheme = () => {
-    const [darkMode, setDarkMode] = useState(getInitialTheme);
-    const [isHydrated, setIsHydrated] = useState(false);
+     const [darkMode, setDarkMode] = useState(getInitialTheme);
+     const [isHydrated, setIsHydrated] = useState(false);
 
-    const toggleDarkMode = useCallback(() => {
-        setDarkMode((prev) => {
-            const newMode = !prev;
-            setTheme(newMode);
-            return newMode;
-        });
-    }, []);
+     const toggleDarkMode = useCallback(() => {
+          setDarkMode((prev) => {
+               const newMode = !prev;
+               setTheme(newMode);
+               return newMode;
+          });
+     }, []);
 
-    useEffect(() => {
-        setIsHydrated(true);
-    }, []);
+     useEffect(() => {
+          setIsHydrated(true);
+     }, []);
 
-    useEffect(() => {
-        if (isHydrated) {
-            setTheme(darkMode);
-        }
-    }, [darkMode, isHydrated]);
+     useEffect(() => {
+          if (isHydrated) {
+               setTheme(darkMode);
+          }
+     }, [darkMode, isHydrated]);
 
-    return { darkMode, toggleDarkMode };
+     return { darkMode, toggleDarkMode };
 };

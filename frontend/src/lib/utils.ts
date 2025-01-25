@@ -5,5 +5,5 @@
  * @returns {string} The concatenated class names.
  */
 export function cn(...classes: (string | undefined)[]): string {
-  return classes.filter(Boolean).join(" ");
+     return classes.filter(Boolean).join(' ');
 }

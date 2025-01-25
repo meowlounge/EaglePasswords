@@ -1,6 +1,30 @@
-# ignore everything
-*
+#frontend
+frontend/node_modules
+frontend/.env
+frontend/.env.example
+frontend/.gitignore
+frontend/.next
+frontend/.vscode
+frontend/package.json
+frontend/package-lock.json
 
-# allow src
-!frontend/src/*
-!backend/src/*
+# root
+node_modules
+.git
+.gitignore
+.prettierrc
+package-lock.json
+package.json
+README.md
+
+# backend
+backend/node_modules
+backend/.env
+backend/.env.example
+backend/.gitignore
+backend/dist
+backend/nodemon.json
+backend/vercel.json
+backend/tsconfig.json
+backend/package.json
+backend/package-lock.json
