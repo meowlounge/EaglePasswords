@@ -6,6 +6,7 @@
     "build": "tsc"
   },
   "dependencies": {
+    "@supabase/supabase-js": "latest",
     "axios": "latest",
     "cookie-parser": "latest",
     "cors": "latest",
@@ -13,9 +14,8 @@
     "express": "latest",
     "express-session": "latest",
     "jsonwebtoken": "latest",
-    "mongodb": "latest",
     "nodemon": "latest",
-    "otplib": "^12.0.1",
+    "otplib": "latest",
     "ulid": "latest"
   },
   "devDependencies": {

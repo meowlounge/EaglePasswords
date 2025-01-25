@@ -33,7 +33,7 @@ export const Button: React.FC<ButtonProps> = ({
     ghost:
       "bg-transparent text-neutral-900 hover:bg-neutral-400/50 dark:bg-transparent dark:text-neutral-100 dark:hover:bg-neutral-700/80",
     border:
-      "border border-neutral-300 hover:border-transparent text-neutral-900 hover:bg-neutral-400/50 dark:border-neutral-700/50 dark:text-neutral-100 dark:hover:bg-neutral-700/50",
+      "border border-neutral-300 hover:border-transparent text-neutral-900 hover:bg-neutral-400/50 dark:border-neutral-700/50 dark:text-neutral-100 dark:hover:bg-neutral-700/50 duration-300",
     danger:
       "bg-red-400 text-neutral-100 hover:bg-red-500 dark:bg-red-500 dark:text-neutral-100 dark:hover:bg-red-500/80",
   };

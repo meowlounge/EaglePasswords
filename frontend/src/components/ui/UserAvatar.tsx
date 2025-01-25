@@ -1,5 +1,4 @@
 // components/entry/UserAvatar.tsx
-"use client";
 import Image from "next/image";
 
 /**

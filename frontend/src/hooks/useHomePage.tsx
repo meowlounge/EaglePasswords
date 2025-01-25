@@ -26,8 +26,6 @@ export const useHomePageLogic = () => {
     {},
   );
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [isCSVDialogOpen, setIsCSVDialogOpen] = useState<boolean>(false);
-  const [isVaultsDialogOpen, setIsVaultsDialogOpen] = useState<boolean>(false);
   const [sortOptions, setSortOptions] = useState<{
     field: "title" | "username" | "createdAt" | "updatedAt" | "strength";
     order: "asc" | "desc";
@@ -142,19 +140,6 @@ export const useHomePageLogic = () => {
     });
   };
 
-  const handleImportSuccess = () => {
-    setLoading(true);
-    setError(null);
-
-    fetchPasswords()
-      .then((fetchedPasswords) => {
-        setPasswords(fetchedPasswords);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
-
   const filteredPasswords = passwords.filter(
     (password) =>
       password.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -192,7 +177,6 @@ export const useHomePageLogic = () => {
     handleDelete,
     handleCloseDialog,
     handleAddOrUpdatePassword,
-    handleImportSuccess,
     isDeleteDialogOpen,
     setIsDeleteDialogOpen,
     selectedPassword,
@@ -201,13 +185,10 @@ export const useHomePageLogic = () => {
     showUsername,
     setshowUsername,
     searchTerm,
-    isCSVDialogOpen,
-    setIsCSVDialogOpen,
-    isVaultsDialogOpen,
-    setIsVaultsDialogOpen,
     setSelectedPassword,
     setNewPassword,
     newPassword,
     sortOptions,
+    setPasswords
   };
 };

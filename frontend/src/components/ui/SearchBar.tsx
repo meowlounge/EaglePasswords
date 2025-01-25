@@ -1,11 +1,12 @@
 import { Button } from "@/components/ui/Button";
-import { ChevronUp, ChevronDown, Search } from "lucide-react";
+import { ChevronUp, ChevronDown, Search, Plus } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 
 interface SearchBarProps {
   searchTerm: string;
   setSearchTerm: (value: string) => void;
+  setIsDialogOpen: (value: boolean) => void;
   sortOptions: {
     field: "title" | "username" | "createdAt" | "updatedAt" | "strength";
     order: "asc" | "desc";
@@ -21,6 +22,7 @@ export const SearchBar = ({
   setSearchTerm,
   sortOptions,
   setSortOptions,
+  setIsDialogOpen
 }: SearchBarProps) => {
   const toggleSortOrder = () => {
     setSortOptions({
@@ -31,6 +33,11 @@ export const SearchBar = ({
 
   return (
     <div className="flex space-x-2 pt-4 px-4">
+      <Button
+        onClick={() => setIsDialogOpen(true)}
+        icon={Plus}
+        variant="border"
+      />
       <Input
         type="search"
         placeholder="Search passwords..."
@@ -53,8 +60,8 @@ export const SearchBar = ({
       />
       <Button
         icon={sortOptions.order === "asc" ? ChevronUp : ChevronDown}
-        content={sortOptions.order === "asc" ? "Ascending" : "Descending"}
         onClick={toggleSortOrder}
+        variant="border"
       />
     </div>
   );

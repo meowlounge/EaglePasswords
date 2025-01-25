@@ -1,3 +1,5 @@
+'use client'
+
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { format, formatDistanceToNow } from "date-fns";
 import { Clock, LucideIcon } from "lucide-react";

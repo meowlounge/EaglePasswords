@@ -1,22 +1,24 @@
-import { MongoClient, Db } from 'mongodb';
+import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 /**
- * A class to manage MongoDB connections and handle multiple database instances.
+ * A class to manage the Supabase connection and handle database operations.
  */
 export class Database {
     private static instance: Database;
-    private client: MongoClient;
-    private db?: Db;
+    private supabase;
 
     private constructor() {
-        const uri = process.env.MONGODB_URI;
-        if (!uri) {
-            throw new Error('MONGODB_URI is not defined in the environment variables.');
+        const supabaseUrl = process.env.SUPABASE_URL;
+        const supabaseKey = process.env.SUPABASE_KEY;
+
+        if (!supabaseUrl || !supabaseKey) {
+            throw new Error('SUPABASE_URL or SUPABASE_KEY is not defined in the environment variables.');
         }
-        this.client = new MongoClient(uri);
+
+        this.supabase = createClient(supabaseUrl, supabaseKey);
     }
 
     /**
@@ -30,26 +32,74 @@ export class Database {
     }
 
     /**
-     * Connects to a MongoDB database. If already connected, returns the existing connection.
-     * @param {string} dbName - The name of the database to connect to.
-     * @returns {Promise<Db>} The MongoDB database instance.
-     * @throws {Error} Throws an error if the connection fails.
+     * Executes a query on Supabase.
+     * @param {string} table - The name of the table to query.
+     * @param {object} filters - The filters for the query.
+     * @returns {Promise<any>} The result of the query.
      */
-    public async connect(dbName: string = "EaglePasswords"): Promise<Db> {
-        if (!this.db || this.db.databaseName !== dbName) {
-            await this.client.connect();
-            this.db = this.client.db(dbName);
+    public async query(table: string, filters: object): Promise<any> {
+        const { data, error } = await this.supabase
+            .from(table)
+            .select('*')
+            .match(filters);
+
+        if (error) {
+            throw new Error(error.message);
         }
-        return this.db;
+        return data;
     }
 
     /**
-     * Closes the MongoDB client connection.
+     * Inserts a new record into a Supabase table.
+     * @param {string} table - The name of the table.
+     * @param {object} values - The values to insert.
+     * @returns {Promise<any>} The inserted record.
      */
-    public async disconnect(): Promise<void> {
-        if (this.client) {
-            await this.client.close();
-            this.db = undefined;
+    public async insert(table: string, values: object): Promise<any> {
+        const { data, error } = await this.supabase
+            .from(table)
+            .insert(values);
+
+        if (error) {
+            throw new Error(error.message);
         }
+        return data;
+    }
+
+    /**
+     * Updates a record in a Supabase table.
+     * @param {string} table - The name of the table.
+     * @param {object} updates - The updates to apply.
+     * @param {object} filters - The filters to find the record.
+     * @returns {Promise<any>} The updated record.
+     */
+    public async update(table: string, updates: object, filters: object): Promise<any> {
+        const { data, error } = await this.supabase
+            .from(table)
+            .update(updates)
+            .match(filters);
+
+        if (error) {
+            throw new Error(error.message);
+        }
+        return data;
+    }
+
+    /**
+     * Deletes a record from a Supabase table.
+     * @param {string} table - The name of the table.
+     * @param {object} filters - The filters to find the record.
+     * @returns {Promise<any>} The deleted record.
+     */
+    public async delete(table: string, filters: object): Promise<any> {
+        const { data, error } = await this.supabase
+            .from(table)
+            .delete()
+            .match(filters);
+
+        if (error) {
+            throw new Error(error.message);
+        }
+        return data;
     }
 }

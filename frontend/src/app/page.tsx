@@ -6,7 +6,6 @@ import { DeleteDialog } from "@/components/Dialogs/DeleteDialog";
 import { LoginPrompt } from "@/components/LoginPrompt";
 import { PasswordDialog } from "@/components/Dialogs/PasswordDialog";
 import { SearchBar } from "@/components/ui/SearchBar";
-import { Header } from "@/components/ui/Header";
 import { PasswordList } from "@/components/Password/PasswordList";
 
 const HomePage = () => {
@@ -43,17 +42,15 @@ const HomePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-100 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100">
+    <div className="min-h-screen bg-neutral-100 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100 mt-16">
       <main className="container mx-auto">
-        <Header
-          setIsDialogOpen={setIsDialogOpen}
-        />
 
         <SearchBar
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
           sortOptions={sortOptions}
           setSortOptions={setSortOptions}
+          setIsDialogOpen={setIsDialogOpen}
         />
 
         {loading ? (

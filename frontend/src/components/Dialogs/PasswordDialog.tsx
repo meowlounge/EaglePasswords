@@ -7,6 +7,7 @@ import {
   LockKeyhole,
   Link2,
   Notebook,
+  SaveAll,
 } from "lucide-react";
 import type { Password } from "@/types";
 
@@ -134,8 +135,8 @@ export const PasswordDialog: React.FC<PasswordDialogProps> = ({
             icon={Notebook}
           />
         </div>
-        <div className="flex justify-end space-x-2 pt-4">
-          <Button type="submit" disabled={!newPassword.password?.trim()}>
+        <div className="flex justify-end space-x-2">
+          <Button icon={SaveAll} className="w-full" type="submit" disabled={!newPassword.password?.trim()}>
             {selectedPassword ? "Save Changes" : "Save Password"}
           </Button>
         </div>

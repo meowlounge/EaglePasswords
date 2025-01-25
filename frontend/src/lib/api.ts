@@ -80,7 +80,6 @@ export const getUserIdFromToken = (): string | null => {
 
     const payload = JSON.parse(atob(token.split(".")[1]));
     const userId = payload.id;
-    console.log(userId)
     if (!userId) {
       console.error("User ID not found in token payload");
       return null;
@@ -133,6 +132,7 @@ const apiRequest = async <T>(
 export const fetchPasswords = async (): Promise<Password[]> => {
   const token = getAuthToken();
   if (!token) return [];
+
   const userId = getUserIdFromToken();
   if (!userId || !isTokenPayloadValid({ id: userId })) {
     console.error("Invalid token");
@@ -143,7 +143,41 @@ export const fetchPasswords = async (): Promise<Password[]> => {
     method: "GET",
     headers: { Authorization: `Bearer ${token}` },
   });
+
   return data || [];
+};
+
+/**
+ * Updates the master password for the current user.
+ *
+ * @param {string} currentPassword - The current master password (for verification).
+ * @param {string} newPassword - The new master password to set.
+ * @returns {Promise<{ success: boolean; message: string }>} Result of the update process.
+ */
+export const updateMasterPassword = async (
+  currentPassword: string,
+  newPassword: string
+): Promise<{ success: boolean; message: string }> => {
+  const token = getAuthToken();
+  const userId = getUserIdFromToken();
+
+  if (!userId || !isTokenPayloadValid({ id: userId })) {
+    return { success: false, message: "Invalid or expired token" };
+  }
+
+  const response = await apiRequest<{ success: boolean; message: string }>(
+    `/api/user/i/${userId}`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ currentPassword, newPassword }),
+    }
+  );
+
+  return response || { success: false, message: "Failed to update master password" };
 };
 
 
@@ -234,11 +268,10 @@ export const deleteUserById = async (id: string): Promise<User | null> => {
     console.error("Invalid token");
     return null;
   }
-  const data = await apiRequest<User>(`/api/user/i/${id}`, {
+  const data = await apiRequest<User>(`/api/users/i/${id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
   });
-  console.log(data)
   return data || null;
 };
 
@@ -256,7 +289,7 @@ export const fetchUserById = async (id: string): Promise<User | null> => {
     return null;
   }
 
-  const data = await apiRequest<User>(`/api/user/i/${id}`, {
+  const data = await apiRequest<User>(`/api/users/${id}`, {
     method: "GET",
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -278,7 +311,7 @@ export const fetchUserByUsername = async (
     return null;
   }
 
-  const data = await apiRequest<User>(`/api/user/u/${username}`, {
+  const data = await apiRequest<User>(`/api/users/u/${username}`, {
     method: "GET",
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -298,7 +331,7 @@ export const enableTwoFactorAuth = async (): Promise<{ otpauthUrl: string } | nu
     return null;
   }
 
-  const data = await apiRequest<{ otpauthUrl: string }>(`/api/user/enable-2fa/${userId}`, {
+  const data = await apiRequest<{ otpauthUrl: string }>(`/api/twofactor/enable/${userId}`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -322,7 +355,7 @@ export const verifyTwoFactorCode = async (code: string): Promise<boolean> => {
     return false;
   }
 
-  const data = await apiRequest<{ message: string }>(`/api/user/verify-2fa/${userId}`, {
+  const data = await apiRequest<{ message: string }>(`/api/twofactor/verify/${userId}`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -347,7 +380,7 @@ export const disableTwoFactorAuth = async (): Promise<boolean> => {
     return false;
   }
 
-  const data = await apiRequest<{ message: string }>(`/api/user/disable-2fa/${userId}`, {
+  const data = await apiRequest<{ message: string }>(`/api/twofactor/disable/${userId}`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,

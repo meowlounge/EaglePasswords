@@ -1,0 +1,6 @@
+# ignore everything
+*
+
+# allow src
+!frontend/src/*
+!backend/src/*

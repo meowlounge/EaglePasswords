@@ -18,7 +18,7 @@ const REDIRECT_URI = process.env.ENVIRONMENT === 'DEVELOPMENT'
  * @param req - The request object containing the incoming HTTP request.
  * @param res - The response object used to send a response to the client.
  */
-export const login = (req: Request, res: Response) => {
+export const login = (req: Request, res: Response): void => {
     const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=identify`;
     res.redirect(discordAuthUrl);
 };
@@ -60,41 +60,41 @@ export const loginCallback = async (req: Request, res: Response): Promise<void> 
 
         const { username, avatar, id } = userInfoResponse.data;
 
-        const database = await Database.getInstance().connect();
-        const usersCollection = database.collection<User>('users');
-        const existingUser = await usersCollection.findOne({ id });
+        const db = Database.getInstance();
+
+        const existingUser = await db.query("users", { id });
 
         const newUser: User = {
             id,
             username,
             avatar,
-            createdAt: "",
+            createdAt: new Date().toISOString(),
             twoFactorEnabled: false,
-            twoFactorSecret: encrypt(authenticator.generateSecret()),
+            twoFactorSecret: "",
             masterPassword: "",
             passwords: [],
         };
 
-        if (!existingUser) {
-            await usersCollection.insertOne(newUser);
-        } else {
+        if (existingUser && existingUser.length > 0) {
             const updatedUserData: any = {
                 username,
                 avatar,
-                createdAt: existingUser.createdAt || new Date().toISOString(),
-                twoFactorEnabled: existingUser.twoFactorEnabled || false,
-                twoFactorSecret: existingUser.twoFactorSecret || encrypt(authenticator.generateSecret()),
-                masterPassword: existingUser.masterPassword || "",
+                createdAt: existingUser[0].createdAt || new Date().toISOString(),
+                twoFactorEnabled: existingUser[0].twoFactorEnabled || false,
+                twoFactorSecret: existingUser[0].twoFactorSecret || "",
+                masterPassword: existingUser[0].masterPassword || "",
             };
 
-            await usersCollection.updateOne({ id }, { $set: updatedUserData });
+            await db.update("users", updatedUserData, { id });
+        } else {
+            await db.insert("users", newUser);
         }
 
         const token = jwt.sign({ username, avatar, id }, JWT_SECRET);
 
         const clientRedirectUrl = process.env.ENVIRONMENT === 'DEVELOPMENT'
-            ? `${process.env.DEV_CLIENT_URL}/signin/callback?token=${token}`
-            : `${process.env.CLIENT_URL}/signin/auth/callback?token=${token}`;
+            ? `${process.env.DEV_CLIENT_URL}/auth/callback?token=${token}`
+            : `${process.env.CLIENT_URL}/auth/callback?token=${token}`;
 
         res.redirect(clientRedirectUrl);
 
@@ -111,4 +111,3 @@ export const loginCallback = async (req: Request, res: Response): Promise<void> 
         }
     }
 };
-
