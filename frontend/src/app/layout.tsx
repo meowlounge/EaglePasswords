@@ -19,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      className="cursor-default select-none dark:bg-neutral-900 not-dark:bg-neutral-100"
+      className="cursor-default dark:bg-neutral-900 not-dark:bg-neutral-100"
       lang="en"
     >
       <body className={`${font_sans.className} antialiased`}>

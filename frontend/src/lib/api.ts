@@ -1,19 +1,4 @@
 import { Password, User } from "@/types";
-import { createClient } from '@supabase/supabase-js';
-
-export const connectDB = async () => {
-  const supabaseUrl = "https://szzbigujyuvejetfffio.supabase.co";
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
-
-  if (!supabaseUrl || !supabaseKey) {
-    throw new Error('SUPABASE_URL or SUPABASE_KEY is not defined in the environment variables.');
-  }
-
-  const supabase = createClient(supabaseUrl, supabaseKey);
-  return supabase;
-};
-
-connectDB();
 
 /**
  * Retrieves the authentication token from cookies.
@@ -79,21 +64,21 @@ export const getValidatedUserIdFromToken = (
   return isTokenPayloadValid({ id: userId }) ? userId : null;
 };
 
+
 /**
  * Extracts the user ID from the authentication token.
- * 
- * @param token - Optional token. If not provided, it will fall back to using getAuthToken().
+ *
  * @returns {string | null} - The user ID if found, otherwise null.
  */
-export const getUserIdFromToken = (token?: string): string | null => {
+export const getUserIdFromToken = (): string | null => {
   try {
-    const authToken = token || getAuthToken();
-    if (!authToken) {
+    const token = getAuthToken();
+    if (!token) {
       console.error("No token found");
       return null;
     }
 
-    const payload = JSON.parse(atob(authToken.split(".")[1]));
+    const payload = JSON.parse(atob(token.split(".")[1]));
     const userId = payload.id;
     if (!userId) {
       console.error("User ID not found in token payload");
@@ -283,11 +268,10 @@ export const deleteUserById = async (id: string): Promise<User | null> => {
     console.error("Invalid token");
     return null;
   }
-  const data = await apiRequest<User>(`/api/users/${id}`, {
+  const data = await apiRequest<User>(`/api/users/i/${id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
   });
-  console.log(data)
   return data || null;
 };
 
@@ -363,8 +347,8 @@ export const enableTwoFactorAuth = async (): Promise<{ otpauthUrl: string } | nu
  * @param {string} code - The 2FA code entered by the user.
  * @returns {Promise<boolean>} True if the code is valid, otherwise false.
  */
-export const verifyTwoFactorCode = async (code: string, token?: string): Promise<boolean> => {
-  const authToken = token || getAuthToken();
+export const verifyTwoFactorCode = async (code: string): Promise<boolean> => {
+  const token = getAuthToken();
   const userId = getUserIdFromToken();
   if (!userId || !isTokenPayloadValid({ id: userId })) {
     console.error("Invalid token");
@@ -374,7 +358,7 @@ export const verifyTwoFactorCode = async (code: string, token?: string): Promise
   const data = await apiRequest<{ message: string }>(`/api/twofactor/verify/${userId}`, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${authToken}`,
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ code }),
@@ -412,16 +396,6 @@ export const disableTwoFactorAuth = async (): Promise<boolean> => {
  * Logs in with Discord via the API.
  * Redirects to the Discord authentication page.
  */
-export async function signInWithDiscord() {
-  const supabase = await connectDB();
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'discord',
-  });
-
-  if (error) {
-    console.error('Error during Discord sign-in:', error.message);
-    return null;
-  }
-
-  return data;
-}
+export const loginWithDiscord = (): void => {
+  window.location.href = `${getBaseApiUrl()}/api/auth`;
+};

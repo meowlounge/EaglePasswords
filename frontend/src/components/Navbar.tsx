@@ -47,7 +47,7 @@ const Navbar = () => {
   };
 
   const menuItems = [
-    { icon: <Key className="w-5 h-5" />, label: "Passwords", path: "/passwords" },
+    { icon: <Key className="w-5 h-5" />, label: "Passwords", path: "/" },
     { icon: <Cog className="w-5 h-5" />, label: "Settings", path: "/settings" },
   ];
 

@@ -201,7 +201,7 @@
               </span>
               •
               <TimeStamp
-                timestamp={password.createdAt}
+                timestamp={password.createdAt || ""}
                 live
                 showIcon={false}
                 icon={Edit}

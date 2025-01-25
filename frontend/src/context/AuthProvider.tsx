@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { fetchUserByUsername, getAuthToken } from "@/lib/api";
+import { fetchUserById, getAuthToken } from "@/lib/api";
 import { User } from "@/types";
 
 /**
@@ -35,7 +35,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const token = getAuthToken();
       if (token) {
         const decoded = JSON.parse(atob(token.split(".")[1])) as User;
-        const userData = await fetchUserByUsername(decoded.username);
+        const userData = await fetchUserById(decoded.id);
         setUser(userData);
       }
     };

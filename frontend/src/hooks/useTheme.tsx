@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 
 const getInitialTheme = (): boolean => {
-    if (typeof window === "undefined") return false;
+    if (typeof window === "undefined") return true;
 
     const storedTheme = localStorage.getItem('theme');
     if (storedTheme) return storedTheme === "dark";
@@ -27,6 +27,7 @@ const setTheme = (isDarkMode: boolean) => {
  */
 export const useTheme = () => {
     const [darkMode, setDarkMode] = useState(getInitialTheme);
+    const [isHydrated, setIsHydrated] = useState(false);
 
     const toggleDarkMode = useCallback(() => {
         setDarkMode((prev) => {
@@ -37,8 +38,14 @@ export const useTheme = () => {
     }, []);
 
     useEffect(() => {
-        setTheme(darkMode);
-    }, [darkMode]);
+        setIsHydrated(true);
+    }, []);
+
+    useEffect(() => {
+        if (isHydrated) {
+            setTheme(darkMode);
+        }
+    }, [darkMode, isHydrated]);
 
     return { darkMode, toggleDarkMode };
 };

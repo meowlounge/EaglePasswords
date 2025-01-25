@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -5,34 +6,35 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
 import { RefreshCcw } from "lucide-react";
-import { createBrowserClient } from "@supabase/ssr";
+import { getBaseApiUrl, fetchUserById } from "@/lib/api";
+import { User } from "@/types";
 
 const DiscordCallback = () => {
   const router = useRouter();
-  const supabase = createBrowserClient("https://szzbigujyuvejetfffio.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6emJpZ3VqeXV2ZWpldGZmZmlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzc0MzQxMzgsImV4cCI6MjA1MzAxMDEzOH0.ABCCnMC3VBilPmaDB79Fm5c3qdp-9C8QsFOH3LYuHlc");
   const [error, setError] = useState<string | null>(null);
-
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const handleCallback = async () => {
+    const fetchToken = async () => {
       try {
-        const { data, error } = await supabase.auth.getUser();
-        if (error || !data?.user) {
-          setError("Konnte keinen Benutzer finden. Bitte erneut versuchen.");
+        const token = new URLSearchParams(window.location.search).get("token") || null;
+        if (!token) {
+          setError("Kein Authentifizierungstoken vorhanden.");
           return;
         }
 
-        console.log(data);
+        document.cookie = `eagletoken=${token}; Expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; secure; SameSite=Strict`;
 
-        router.push("/passwords");
-      } catch (err) {
-        console.error("Error during callback handling:", err);
-        setError("Ein Fehler ist aufgetreten. Bitte erneut versuchen.");
+        const userData = await fetchUserById(token);
+        setUser(userData);
+        router.push("/");
+      } catch (error) {
+        setError("Fehler beim Verarbeiten des Tokens. Bitte versuchen Sie es erneut.");
       }
     };
 
-    handleCallback();
-  }, [router, supabase]);
+    fetchToken();
+  }, [router]);
 
   if (error) {
     return (
@@ -41,12 +43,14 @@ const DiscordCallback = () => {
           <h2 className="text-3xl font-bold text-red-500 mb-4">Fehler!</h2>
           <p className="text-neutral-300 mb-6">{error}</p>
           <Button
-            onClick={() => router.push("/auth")}
+            onClick={() =>
+              (window.location.href = `${getBaseApiUrl()}/api/auth`)
+            }
             variant="danger"
             className="w-full"
             icon={RefreshCcw}
             content="Erneut Anmelden"
-          />
+          ></Button>
         </div>
       </div>
     );
@@ -58,6 +62,9 @@ const DiscordCallback = () => {
         <h2 className="text-3xl font-bold text-neutral-100 mb-4">
           Authentifizierung wird verarbeitet...
         </h2>
+        <h1>
+          Welcome {user?.username}
+        </h1>
         <Spinner className="h-12 w-12 text-neutral-500 mx-auto mb-6" />
         <p className="text-neutral-300">Bitte warten Sie einen Moment...</p>
       </div>

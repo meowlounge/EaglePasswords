@@ -70,20 +70,13 @@ const SettingsPage = () => {
                                 </div>
                             </div>
                         )}
-                        <div className="flex gap-4">
+                        <div>
                             <Button
                                 content="Delete Account"
                                 icon={Trash2}
                                 onClick={() => setIsDeleteAccountDialogOpen(true)}
                                 variant="danger"
-                                className="w-3/4"
-                            />
-                            <Button
-                                content="Clear Passwords"
-                                icon={Trash2}
-                                onClick={() => toast.success("erm")}
-                                variant="danger"
-                                className="w-1/4"
+                                className="w-full"
                             />
                         </div>
                     </div>

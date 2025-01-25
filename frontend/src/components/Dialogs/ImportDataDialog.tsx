@@ -81,7 +81,6 @@ export const DataImporter = ({
 
               if (!row.username || !row.password) {
                 skipped.push(i + 1);
-                console.log(`Skipping invalid row ${i + 1}:`, row);
                 continue;
               }
 
@@ -132,7 +131,6 @@ export const DataImporter = ({
 
             if (!row.username || !row.password) {
               skipped.push(i + 1);
-              console.log(`Skipping invalid row ${i + 1}:`, row);
               continue;
             }
 
@@ -148,7 +146,6 @@ export const DataImporter = ({
 
             if (!passwordData.username || !passwordData.password) {
               skipped.push(i + 1);
-              console.log(`Skipping invalid row ${i + 1}:`, row);
               continue;
             }
 
