@@ -11,7 +11,7 @@ export class Database {
     private supabase;
 
     private constructor() {
-        const supabaseUrl = "https://szzbigujyuvejetfffio.supabase.co"; // this is safe
+        const supabaseUrl = process.env.SUPABASE_URL;
         const supabaseKey = process.env.SUPABASE_KEY;
 
         if (!supabaseUrl || !supabaseKey) {
@@ -101,31 +101,5 @@ export class Database {
             throw new Error(error.message);
         }
         return data;
-    }
-
-    /**
-     * Creates a table if it does not already exist.
-     * @param {string} table - The name of the table to create.
-     * @param {string} schema - The SQL schema for the table.
-     * @returns {Promise<void>}
-     */
-    public async createTableIfNotExists(table: string, schema: string): Promise<void> {
-        const { data, error } = await this.supabase.rpc('check_table_exists', { table_name: table });
-
-        if (error) {
-            throw new Error(`Error checking table existence: ${error.message}`);
-        }
-
-        if (data[0].exists === false) {
-            const { error: createError } = await this.supabase.rpc('create_table', { table_name: table, schema: schema });
-
-            if (createError) {
-                throw new Error(`Error creating table: ${createError.message}`);
-            }
-
-            console.log(`[INFO]: Table ${table} created successfully.`);
-        } else {
-            console.log(`[INFO]: Table ${table} already exists.`);
-        }
     }
 }
