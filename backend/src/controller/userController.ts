@@ -22,8 +22,8 @@ export const getUserByUsername = async (req: Request, res: Response): Promise<vo
 
     try {
         const user = await db.query("users", { username });
-
-        if (!user || !user[0]) {
+        
+        if (!user.length) {
             res.status(404).send("User not found");
             return;
         }
@@ -59,7 +59,7 @@ export const getUserById = async (req: Request, res: Response): Promise<void> =>
     try {
         const user = await db.query("users", { id });
 
-        if (!user || !user[0]) {
+        if (!user.length) {
             res.status(404).send("User not found");
             return;
         }

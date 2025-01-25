@@ -16,7 +16,6 @@ export const getPasswords = async (req: Request, res: Response): Promise<void> =
     const db = Database.getInstance();
 
     if (!userId) {
-        console.log("Unauthorized access attempt, no user ID found.");
         res.status(403).send("Unauthorized");
         return;
     }
@@ -25,7 +24,6 @@ export const getPasswords = async (req: Request, res: Response): Promise<void> =
         const user = await db.query("users", { id: userId });
 
         if (!user || !user[0]?.passwords) {
-            console.log(`No passwords found for user: ${userId}`);
             res.status(410).send("No passwords found");
             return;
         }
