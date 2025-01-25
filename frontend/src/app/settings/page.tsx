@@ -33,8 +33,8 @@ const SettingsPage = () => {
         setIsImportDialogOpen,
         setIsExportDialogOpen,
         setIsChangePasswordDialogOpen,
-        handleEnable2FA,
-        handleDisable2FA,
+        // handleEnable2FA,
+        // handleDisable2FA,
         handleDeleteAccount,
         setError,
         handleImportSuccess
@@ -99,7 +99,8 @@ const SettingsPage = () => {
                                 <Button
                                     icon={Shield}
                                     content={user?.twoFactorEnabled ? "Disable" : "Enable"}
-                                    onClick={user?.twoFactorEnabled ? handleDisable2FA : handleEnable2FA}
+                                    // onClick={user?.twoFactorEnabled ? handleDisable2FA : handleEnable2FA}
+                                    disabled
                                 />
                             </div>
                             <div className="flex items-center justify-between">
@@ -116,6 +117,7 @@ const SettingsPage = () => {
                                     icon={Lock}
                                     content="Change"
                                     variant="border"
+                                    disabled
                                 />
                             </div>
                         </div>

@@ -268,7 +268,7 @@ export const deleteUserById = async (id: string): Promise<User | null> => {
     console.error("Invalid token");
     return null;
   }
-  const data = await apiRequest<User>(`/api/users/i/${id}`, {
+  const data = await apiRequest<User>(`/api/users/${id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
   });
