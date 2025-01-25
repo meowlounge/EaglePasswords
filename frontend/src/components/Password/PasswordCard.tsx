@@ -12,6 +12,9 @@ import {
 import { Password } from '@/types';
 import { PasswordStrengthBar, gradientVariants } from './PasswordStrengthBar';
 import { TimeStamp } from '@/components/ui/Timestamp';
+import { Geist_Mono } from 'next/font/google';
+
+const font_mono = Geist_Mono({ fallback: ['system-ui'], subsets: ['latin'] });
 
 export const getPasswordStrength = (
      password: string
@@ -65,7 +68,7 @@ export const PasswordCard = ({
 
      return (
           <div
-               className='relative bg-neutral-100 dark:bg-neutral-950/50 backdrop-blur-xl rounded-xl hover:rounded-2xl border border-neutral-300 hover:shadow-xl transition-all duration-300 hover:-translate-y-2 dark:border-neutral-800/50 overflow-hidden'
+               className='relative bg-neutral-100 dark:bg-neutral-950/50 backdrop-blur-xl rounded-xl hover:scale-3d border border-neutral-300 transition-all duration-300 dark:border-neutral-800/50 overflow-hidden'
                onMouseEnter={() => setIsHovered(true)}
                onMouseLeave={() => setIsHovered(false)}
           >
@@ -121,7 +124,9 @@ export const PasswordCard = ({
                                    <div className='text-xs text-neutral-600 mb-1 dark:text-neutral-400'>
                                         Username
                                    </div>
-                                   <div className='font-mono text-sm text-neutral-700 truncate dark:text-neutral-100'>
+                                   <div
+                                        className={`${font_mono.className} text-sm text-neutral-700 truncate dark:text-neutral-100`}
+                                   >
                                         {showUsername[password.id]
                                              ? password.username
                                              : '•'.repeat(8)}
@@ -169,7 +174,9 @@ export const PasswordCard = ({
                                    <div className='text-xs text-neutral-600 mb-1 dark:text-neutral-400'>
                                         Password
                                    </div>
-                                   <div className='font-mono text-sm text-neutral-700 truncate dark:text-neutral-100'>
+                                   <div
+                                        className={`${font_mono.className} text-sm text-neutral-700 truncate dark:text-neutral-100`}
+                                   >
                                         {showPassword[password.id]
                                              ? password.password
                                              : '•'.repeat(12)}

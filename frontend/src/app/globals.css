@@ -1,10 +1,8 @@
 @import 'tailwindcss';
-
 @config '../../tailwind.config.ts';
-
 @theme {
      --font*: initial;
-     --font-sans: 'DM Sans, Inter' --font-mono: 'Geist Mono', monospace;
+     --font-sans: 'DM Sans, Inter'; --font-mono: 'Geist Mono', monospace;
 }
 
 @keyframes fade-in {
