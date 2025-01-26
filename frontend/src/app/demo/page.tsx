@@ -12,6 +12,7 @@ import { Select } from '@/components/ui/Select';
 import { Spinner } from '@/components/ui/Spinner';
 import { TimeStamp } from '@/components/ui/Timestamp';
 import { UserAvatar } from '@/components/ui/UserAvatar';
+import Navbar from '@/components/Navbar';
 
 const DemoPage = () => {
 	const [showPassword, setShowPassword] = useState<Record<string, boolean>>(
@@ -30,15 +31,28 @@ const DemoPage = () => {
 	};
 
 	const handleEdit = (password: Password) => {
-		toast.success('Edit password', password);
+		toast.success(`Edit password: ${password.title}`, {
+			id: `edit-${Date.now()}`,
+		});
 	};
 
 	const handleFavorite = (password: Password) => {
-		toast.error('Toggle favorite for', password);
+		toast.success(`Toggle favorite for: ${password.title}`, {
+			id: `favorite-${Date.now()}`,
+		});
 	};
 
 	const handleDelete = (password: Password) => {
-		toast.info('Delete password', password);
+		toast.success(`Delete password: ${password.title}`, {
+			id: `delete-${Date.now()}`,
+		});
+	};
+
+	const handleSelectChange = (value: string) => {
+		setSelected(value);
+		toast.info(`Selected: ${value}`, {
+			id: `select-${Date.now()}`,
+		});
 	};
 
 	const mockPassword: Password = {
@@ -59,14 +73,15 @@ const DemoPage = () => {
 
 	return (
 		<main className='p-8 mt-16'>
+			<Navbar />
 			<div className='max-w-screen-lg mx-auto px-4'>
-				<h1 className='text-3xl font-semibold dark:text-dark-text text-light-text mb-8'>
+				<h1 className='text-3xl font-semibold dark:text-neutral-100 text-neutral-800 mb-8'>
 					Demo Page - UI Testing
 				</h1>
 
 				{/* Password Card */}
 				<section className='mb-12'>
-					<h2 className='text-2xl font-semibold dark:text-dark-text text-light-text mb-4'>
+					<h2 className='text-2xl font-semibold dark:text-neutral-100 text-neutral-800 mb-4'>
 						Password Card
 					</h2>
 					<PasswordCard
@@ -83,7 +98,7 @@ const DemoPage = () => {
 
 				{/* Button Variants */}
 				<section className='mb-12'>
-					<h2 className='text-2xl font-semibold dark:text-dark-text text-light-text mb-4'>
+					<h2 className='text-2xl font-semibold dark:text-neutral-100 text-neutral-800 mb-4'>
 						Button Variants
 					</h2>
 					<div className='grid grid-cols-2 sm:grid-cols-3 gap-4'>
@@ -121,7 +136,7 @@ const DemoPage = () => {
 						onClose={closeDialog}
 						title='Demo Dialog'
 					>
-						<div className='space-y-6 dark:text-dark-text text-light-text'>
+						<div className='space-y-6 dark:text-neutral-100 text-neutral-800'>
 							<p className='text-lg'>
 								This is a demo dialog. You can add content here.
 								For example, a button:
@@ -145,7 +160,7 @@ const DemoPage = () => {
 
 				{/* Input Component */}
 				<section className='mb-12'>
-					<h2 className='text-2xl font-semibold dark:text-dark-text text-light-text mb-4'>
+					<h2 className='text-2xl font-semibold dark:text-neutral-100 text-neutral-800 mb-4'>
 						Input Components
 					</h2>
 					<div className='space-y-4'>
@@ -169,12 +184,12 @@ const DemoPage = () => {
 
 				{/* Select Component */}
 				<section className='mb-12'>
-					<h2 className='text-2xl font-semibold dark:text-dark-text text-light-text mb-4'>
+					<h2 className='text-2xl font-semibold dark:text-neutral-100 text-neutral-800 mb-4'>
 						Select Component
 					</h2>
 					<Select
 						value={selected}
-						onChange={setSelected}
+						onChange={(e) => handleSelectChange(e)}
 						options={Array.from({ length: 250 }, (_, index) => ({
 							value: `option${index + 1}`,
 							label: `Option ${index + 1}`,
@@ -184,7 +199,7 @@ const DemoPage = () => {
 
 				{/* Spinner */}
 				<section className='mb-12'>
-					<h2 className='text-2xl font-semibold dark:text-dark-text text-light-text mb-4'>
+					<h2 className='text-2xl font-semibold dark:text-neutral-100 text-neutral-800 mb-4'>
 						Spinner Component
 					</h2>
 					<Spinner size='w-8 h-8' speed='0.5s' />
@@ -192,7 +207,7 @@ const DemoPage = () => {
 
 				{/* Timestamp Component */}
 				<section className='mb-12'>
-					<h2 className='text-2xl font-semibold dark:text-dark-text text-light-text mb-4'>
+					<h2 className='text-2xl font-semibold dark:text-neutral-100 text-neutral-800 mb-4'>
 						Timestamp Component
 					</h2>
 					<TimeStamp timestamp={mockPassword.createdAt} />
@@ -200,13 +215,15 @@ const DemoPage = () => {
 
 				{/* User Avatar */}
 				<section>
-					<h2 className='text-2xl font-semibold dark:text-dark-text text-light-text mb-4'>
+					<h2 className='text-2xl font-semibold dark:text-neutral-100 text-neutral-800 mb-4'>
 						User Avatar Component
 					</h2>
 					<UserAvatar
 						avatar='a_0e48ec466029664d674e5b3371d7c943'
 						username='prodbyeagle'
 						id='893759402832699392'
+						size='lg'
+						quality={64}
 					/>
 				</section>
 			</div>

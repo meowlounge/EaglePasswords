@@ -87,6 +87,7 @@ export const TimeStamp = ({
 
 	return (
 		<time
+			suppressHydrationWarning
 			title={format(new Date(timestamp), 'dd.MM.yyyy HH:mm:ss')}
 			dateTime={timestamp}
 			className={cn(

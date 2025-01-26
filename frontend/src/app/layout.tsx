@@ -1,11 +1,13 @@
 import './globals.css';
 import { AuthProvider } from '@/context/AuthProvider';
-import { DM_Sans } from 'next/font/google';
 import { Toaster } from 'sonner';
-import Navbar from '@/components/Navbar';
-import { ThemeProvider } from '@/context/ThemeProvider'; // Import the ThemeProvider
+import { ThemeProvider } from '@/context/ThemeProvider';
+import localFont from 'next/font/local';
 
-const font_sans = DM_Sans({ fallback: ['system-ui'], subsets: ['latin'] });
+const Font = localFont({
+	src: '../../public/fonts/GeneralSans-Variable.woff2',
+	display: 'swap',
+});
 
 export const metadata = {
 	icons: {
@@ -23,12 +25,11 @@ export default function RootLayout({
 			className='cursor-default select-none dark:bg-neutral-900 not-dark:bg-neutral-100'
 			lang='en'
 		>
-			<body className={`${font_sans.className} antialiased`}>
+			<body className={`${Font.className} antialiased`}>
 				<link rel='icon' href={metadata.icons.icon} />
 				<ThemeProvider>
 					{' '}
 					<AuthProvider>
-						<Navbar />
 						<div>
 							{children}
 							<Toaster

@@ -7,6 +7,7 @@ import { LoginPrompt } from '@/components/LoginPrompt';
 import { PasswordDialog } from '@/components/Dialogs/PasswordDialog';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { PasswordList } from '@/components/Password/PasswordList';
+import Navbar from '@/components/Navbar';
 
 const HomePage = () => {
 	const {
@@ -50,6 +51,7 @@ const HomePage = () => {
 
 	return (
 		<div className='min-h-screen bg-neutral-100 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100 mt-16'>
+			<Navbar />
 			<main className='container mx-auto'>
 				<SearchBar
 					searchTerm={searchTerm}

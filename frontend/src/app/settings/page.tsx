@@ -15,6 +15,7 @@ import { useSettingsPage } from '@/hooks/useSettingsPage';
 import { enableTwoFactorAuth, verifyTwoFactorCode } from '@/lib/api';
 import { toast } from 'sonner';
 import { Spinner } from '@/components/ui/Spinner';
+import Navbar from '@/components/Navbar';
 
 const SettingsPage = () => {
 	const { passwords } = useHomePageLogic();
@@ -41,6 +42,7 @@ const SettingsPage = () => {
 
 	return (
 		<div className='dark:bg-neutral-900 not-dark:bg-neutral-100 flex items-center justify-center min-h-screen'>
+			<Navbar />
 			<div className='max-w-4xl mx-auto p-6 w-full mt-13'>
 				<div className='space-y-6'>
 					<div className='bg-neutral-100 dark:bg-neutral-950/50 backdrop-blur-xl rounded-xl border border-neutral-300 dark:border-neutral-800/50 p-6'>
