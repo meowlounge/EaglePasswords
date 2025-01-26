@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import {
-     deleteUserById,
-     getUserById,
-     getUserByUsername,
-     updateUser,
+	deleteUserById,
+	getUserById,
+	getUserByUsername,
+	updateUser,
 } from '../controller/userController';
 import { authenticateToken } from '../middlewares/authMiddleware';
 

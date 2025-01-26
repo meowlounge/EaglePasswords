@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import {
-     getPasswords,
-     addPassword,
-     updatePassword,
-     deletePassword,
+	getPasswords,
+	addPassword,
+	updatePassword,
+	deletePassword,
 } from '../controller/passwordController';
 import { authenticateToken } from '../middlewares/authMiddleware';
 
