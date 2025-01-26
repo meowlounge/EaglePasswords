@@ -7,6 +7,11 @@ frontend/.next
 frontend/.vscode
 frontend/package.json
 frontend/package-lock.json
+frontend/tsconfig.json
+frontend/next-env.d.ts
+frontend/next.config.ts
+frontend/postcss.config.mjs
+frontend/eslint.config.mjs
 
 # root
 node_modules
@@ -28,3 +33,4 @@ backend/vercel.json
 backend/tsconfig.json
 backend/package.json
 backend/package-lock.json
+backend/api
