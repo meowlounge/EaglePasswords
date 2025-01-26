@@ -15,19 +15,6 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 6969;
 
-//? Testing if this fixes the Cors Bug
-// const allowedOrigins = [
-//      'http://localhost:3001',
-//      'https://eaglepasswords-backend.vercel.app',
-//      'chrome-extension://jdgglenepaancflogpmgmmgdaifiihmo',
-// ];
-
-// const corsOptions: cors.CorsOptions = {
-//      origin: allowedOrigins,
-//      credentials: true,
-//      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-// };
-
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
