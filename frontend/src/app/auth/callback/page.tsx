@@ -29,7 +29,7 @@ const DiscordCallback = () => {
 
 				const userData = await fetchUserById(token);
 				setUser(userData);
-				router.push('/');
+				router.push('/passwords');
 			} catch (error) {
 				setError(
 					'Fehler beim Verarbeiten des Tokens. Bitte versuchen Sie es erneut.'
