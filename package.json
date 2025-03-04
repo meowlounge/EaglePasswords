@@ -6,9 +6,6 @@
     "start": "npx prettier . --write"
   },
   "devDependencies": {
-    "prettier": "3.4.2"
-  },
-  "dependencies": {
-    "sonner": "^1.7.2"
+    "prettier": "latest"
   }
 }

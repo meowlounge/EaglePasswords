@@ -15,37 +15,27 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 6969;
 
-const allowedOrigins = [
-    'http://localhost:3001',
-    'https://eaglepasswords-backend.vercel.app',
-    'chrome-extension://jdgglenepaancflogpmgmmgdaifiihmo'
-];
-
-const corsOptions: cors.CorsOptions = {
-    origin: allowedOrigins,
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-};
-
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
-app.use(session({
-    secret: process.env.JWT_SECRET || 'secret',
-    resave: false,
-    saveUninitialized: true,
-}));
+app.use(
+	session({
+		secret: process.env.JWT_SECRET || 'secret',
+		resave: false,
+		saveUninitialized: true,
+	})
+);
 
 const db = Database.getInstance();
 
 db.query('users', { id: 'test' })
-    .then(() => {
-        console.log('[DB]: Supabase connected successfully');
-    })
-    .catch((err) => {
-        console.error('[ERROR]: Supabase connection failed:', err);
-        process.exit(1);
-    });
+	.then(() => {
+		console.log('[DB]: Supabase connected successfully');
+	})
+	.catch((err) => {
+		console.error('[ERROR]: Supabase connection failed:', err);
+		process.exit(1);
+	});
 
 app.use(authRoutes);
 app.use(passwordRoutes);
@@ -54,7 +44,7 @@ app.use(statusRoutes);
 app.use(twoFactorRoutes);
 
 app.listen(PORT, () => {
-    console.log(`[INFO]: Server running on http://localhost:${PORT}`);
+	console.log(`[INFO]: Server running on http://localhost:${PORT}`);
 });
 
 export default app;
